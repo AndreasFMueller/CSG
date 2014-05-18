@@ -1,6 +1,6 @@
 constructive solid geometry package
 
-This set of tools is intended for usein writing programs that construct
+This set of tools is intended for use in writing programs that construct
 mathematical models. It hopes to provide to primitive methods that are
 somewhat more useful for the construction of mathematical models than
 the usual geometry packages do. E.g. it should be simple to create the graph
