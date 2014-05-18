@@ -1,0 +1,7 @@
+#
+# standard configuration
+#
+CFLAGS="-g -Wall -O2"
+CXXFLAGS="-g -Wall -O2"
+export CFLAGS CXXFLAGS
+./configure
