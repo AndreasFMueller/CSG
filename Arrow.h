@@ -10,13 +10,13 @@
 
 namespace csg {
 
-class Build_Arrow : public CGAL::Modifier_base<Polyhedron::HalfedgDS> {
+class Build_Arrow : public CGAL::Modifier_base<Polyhedron::HalfedgeDS> {
 	Point	_from;
 	Point	_to;
 	double	_radius;
 	int _steps;
 public:
-	Build_arrow(const Point& from, const Point& to, double radius,
+	Build_Arrow(const Point& from, const Point& to, double radius,
 		int steps = 4)
 		: _from(from), _to(to), _radius(radius), _steps(steps) {
 	}
