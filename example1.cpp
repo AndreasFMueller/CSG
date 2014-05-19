@@ -97,7 +97,7 @@ int	main(int argc, char *argv[]) {
 	p3.delegate(b3);
 
 	Sine3	sine3;
-	Build_PolarCoordinatesSurface	b4(sine3, 20, 20, 1);
+	Build_PolarCoordinatesSurface	b4(sine3, 20, 40, 0.1);
 	p4.delegate(b4);
 
 	// compute translation

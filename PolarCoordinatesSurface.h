@@ -15,6 +15,13 @@ class Build_PolarCoordinatesSurface
 	PolarFunction&	_f;
 	int	_rsteps, _phisteps;
 	double	_h;
+	// members used during constrution
+	double	deltar, deltaphi;
+	double	_phi, _r;
+	int	vertexnumber;
+	// add vertices
+	void	add_vertices(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B);
+	// methods used during creation
 	int	open_vertex(const int x, const int y) const;
 	int	open0_vertex(const int x, const int y) const;
 	int	closed_vertex(const int x, const int y) const;
@@ -27,6 +34,9 @@ public:
 	Build_PolarCoordinatesSurface(PolarFunction& f, int rsteps,
 		int phisteps, double h)
 		: _f(f), _rsteps(rsteps), _phisteps(phisteps), _h(h) {
+		deltar = _f.rrange().length() / _rsteps;
+		deltaphi = _f.phirange().length() / _phisteps;
+		vertexnumber = 0;
 	}
 	void	operator()(Polyhedron::HalfedgeDS& hds);
 };

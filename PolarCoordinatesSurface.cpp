@@ -41,20 +41,82 @@ int	Build_PolarCoordinatesSurface::closed_vertex(const int r, const int phi) con
  * \brief create a closed0 surface
  */
 void	Build_PolarCoordinatesSurface::closed0_surface(Polyhedron::HalfedgeDS& hds) {
-	
+	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
+	B.begin_surface(0, 0, 0);
+	add_vertices(B);
+	if (debug) {
+		fprintf(stderr, "%s:%d: facets\n", __FILE__, __LINE__);
+	}
+	B.end_surface();
+}
+
+/**
+ * \brief add vertices (common to all surfaces)
+ */
+void	Build_PolarCoordinatesSurface::add_vertices(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B) {
+	if (debug) {
+		fprintf(stderr, "%s:%d: vertices\n", __FILE__, __LINE__);
+	}
+	int	philimit = (_f.phirange() == Interval2Pi) ? (_phisteps - 1)
+							:_phisteps;
+	for (int r = 0; r <= _rsteps; r++) {
+		double	_r = _f.rrange().min() + r * deltar;
+		for (int phi = 0; phi < philimit; phi++) {
+			double	_phi = _f.phirange().min() + phi * deltaphi;
+			double	_x = _r * cos(_phi);
+			double	_y = _r * sin(_phi);
+			double	z = _f(_r, _phi);
+			if (debug) {
+				fprintf(stderr, "%s:%d: %d (%f, %f, %f)\n",
+					__FILE__, __LINE__, vertexnumber,
+					_x, _y, z + _h/2);
+				fprintf(stderr, "%s:%d: %d (%f, %f, %f)\n",
+					__FILE__, __LINE__, vertexnumber,
+					_x, _y, z - _h/2);
+			}
+			B.add_vertex(Point(_x, _y, z + _h/2));
+			B.add_vertex(Point(_x, _y, z - _h/2));
+			vertexnumber += 2;
+		}
+	}
+	if (_f.rrange().min() == 0) {
+		double	_z = _f(0, 0);
+		if (debug) {
+			fprintf(stderr, "%s:%d: %d (0, 0, %f)\n",
+				__FILE__, __LINE__, vertexnumber, _z + _h/2);
+			fprintf(stderr, "%s:%d: %d (0, 0, %f)\n",
+				__FILE__, __LINE__, vertexnumber + 1, _z - _h/2);
+		}
+		B.add_vertex(Point(0, 0, _z + _h/2));
+		B.add_vertex(Point(0, 0, _z - _h/2));	
+		vertexnumber += 2;
+	}
 }
 
 /**
  * \brief create a closed surface
  */
 void	Build_PolarCoordinatesSurface::closed_surface(Polyhedron::HalfedgeDS& hds) {
-	
+	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
+	B.begin_surface(0, 0, 0);
+	add_vertices(B);
+	if (debug) {
+		fprintf(stderr, "%s:%d: facets\n", __FILE__, __LINE__);
+	}
+	B.end_surface();
 }
 
 /**
  * \brief create an open0 surface
  */
 void	Build_PolarCoordinatesSurface::open0_surface(Polyhedron::HalfedgeDS& hds) {
+	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
+	B.begin_surface(0, 0, 0);
+	add_vertices(B);
+	if (debug) {
+		fprintf(stderr, "%s:%d: facets\n", __FILE__, __LINE__);
+	}
+	B.end_surface();
 }
 
 /**
@@ -63,32 +125,7 @@ void	Build_PolarCoordinatesSurface::open0_surface(Polyhedron::HalfedgeDS& hds) {
 void	Build_PolarCoordinatesSurface::open_surface(Polyhedron::HalfedgeDS& hds) {
 	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
 	B.begin_surface(0, 0, 0);
-	double	deltar = _f.rrange().length() / _rsteps;
-	double	deltaphi = _f.phirange().length() / _phisteps;
-	int	vertexnumber = 0;
-	if (debug) {
-		fprintf(stderr, "%s:%d: vertices\n", __FILE__, __LINE__);
-	}
-	for (int r = 0; r <= _rsteps; r++) {
-		double	_r = _f.rrange().min() + r * deltar;
-		for (int phi = 0; phi <= _phisteps; phi++) {
-			double	_phi = _f.phirange().min() + phi * deltaphi;
-			double	_x = _r * cos(_phi);
-			double	_y = _r * sin(_phi);
-			double	z = _f(_r, _phi);
-			if (debug) {
-				fprintf(stderr, "%s:%d: %d (%f,%f,%f)\n",
-					__FILE__, __LINE__, vertexnumber,
-					_x, _y, z + _h/2);
-				fprintf(stderr, "%s:%d: %d (%f,%f,%f)\n",
-					__FILE__, __LINE__, vertexnumber + 1,
-					_x, _y, z - _h/2);
-			}
-			B.add_vertex(Point(_x, _y, z + _h/2));
-			B.add_vertex(Point(_x, _y, z - _h/2));
-			vertexnumber += 2;
-		}
-	}
+	add_vertices(B);
 	int	facenumber = 0;
 	if (debug) {
 		fprintf(stderr, "%s:%d: surface facets\n", __FILE__, __LINE__);
