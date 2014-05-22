@@ -19,8 +19,11 @@ class Build_PolarCoordinatesSurface
 	double	deltar, deltaphi;
 	double	_phi, _r;
 	int	vertexnumber;
+	int	facenumber;
 	// add vertices
 	void	add_vertices(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B);
+	void	add_surface_triangles(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B);
+
 	// methods used during creation
 	int	open_vertex(const int x, const int y) const;
 	int	open0_vertex(const int x, const int y) const;

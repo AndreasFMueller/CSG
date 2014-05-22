@@ -120,13 +120,12 @@ void	Build_PolarCoordinatesSurface::open0_surface(Polyhedron::HalfedgeDS& hds) {
 }
 
 /**
- * \brief create an open surface
+ * \brief add surface triangles
+ *
+ * This method does not add the triangles along the border of the domain
  */
-void	Build_PolarCoordinatesSurface::open_surface(Polyhedron::HalfedgeDS& hds) {
-	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
-	B.begin_surface(0, 0, 0);
-	add_vertices(B);
-	int	facenumber = 0;
+void	Build_PolarCoordinatesSurface::add_surface_triangles(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B) {
+	facenumber = 0;
 	if (debug) {
 		fprintf(stderr, "%s:%d: surface facets\n", __FILE__, __LINE__);
 	}
@@ -191,6 +190,17 @@ void	Build_PolarCoordinatesSurface::open_surface(Polyhedron::HalfedgeDS& hds) {
 			facenumber++;
 		}
 	}
+}
+
+
+/**
+ * \brief create an open surface
+ */
+void	Build_PolarCoordinatesSurface::open_surface(Polyhedron::HalfedgeDS& hds) {
+	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
+	B.begin_surface(0, 0, 0);
+	add_vertices(B);
+	add_surface_triangles(B);
 	if (debug) {
 		fprintf(stderr, "%s:%d: radiant surfaces\n",
 			__FILE__, __LINE__);

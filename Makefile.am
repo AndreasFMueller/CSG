@@ -26,4 +26,4 @@ example1_SOURCES = example1.cpp
 example1_LDADD = libcsg.la
 
 test:	example1
-	time ./example1 -d -r 10 -n 10 > example1.off
+	time ./example1 -d -r 10 -n 2 > example1.off
