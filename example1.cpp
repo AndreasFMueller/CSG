@@ -49,10 +49,9 @@ public:
 /**
  * \brief Sine3 function for Polar example
  */
-class	Sine3 : public PolarFunction {
+class	Sine3 : public Function {
 public:
-	Sine3() : PolarFunction(Interval(1,5), Interval2Pi) {
-	}
+	Sine3() { }
 	double	operator()(const double r, const double phi) {
 		return r * r * r * sin(3 * phi) / 25.;
 	}
@@ -99,7 +98,8 @@ int	main(int argc, char *argv[]) {
 #endif
 
 	Sine3	sine3;
-	Build_PolarCoordinatesSurface	b4(sine3, 10 * steps, 20 * steps, 0.1);
+	PolarDomain	polardomain(Interval(1,5), Interval2Pi);
+	Build_PolarFunction	b4(sine3, polardomain, 10 * steps, 20 * steps, 0.1);
 	p4.delegate(b4);
 
 	// compute translation

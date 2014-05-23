@@ -6,21 +6,28 @@
 #include <PolarCoordinatesSurface.h>
 
 #include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <math.h>
 
 namespace csg {
 
-bool	Build_PolarCoordinatesSurface::closed() const {
-	return (_f.phirange() == Interval2Pi) ? true : false;
+/**
+ * \brief Find out whether the surface is closed
+ */
+bool	Build_Polar::closed() const {
+	return (_domain.phirange() == Interval2Pi) ? true : false;
 }
 
-bool	Build_PolarCoordinatesSurface::contains0() const {
-	return (_f.rrange().min() == 0) ? true : false;
+/**
+ * \brief Find out whether r=0 is included in the domain
+ */
+bool	Build_Polar::contains0() const {
+	return (_domain.rrange().min() == 0) ? true : false;
 }
 
 /**
  * \brief Vertex number for open surface
  */
-int	Build_PolarCoordinatesSurface::vertex(const int r, const int phi) const {
+int	Build_Polar::vertex(const int r, const int phi) const {
 	if (closed()) {
 		int	p = phi;
 		if (phi == _phisteps) {
@@ -34,7 +41,7 @@ int	Build_PolarCoordinatesSurface::vertex(const int r, const int phi) const {
 /**
  * \brief add vertices (common to all surfaces)
  */
-void	Build_PolarCoordinatesSurface::add_vertices(Builder& B) {
+void	Build_Polar::add_vertices(Builder& B) {
 	if (debug) {
 		fprintf(stderr, "%s:%d: vertices\n", __FILE__, __LINE__);
 	}
@@ -45,24 +52,20 @@ void	Build_PolarCoordinatesSurface::add_vertices(Builder& B) {
 	}
 	int	rinit = (contains0()) ? 1 : 0;
 	for (int r = rinit; r <= _rsteps; r++) {
-		double	_r = _f.rrange().min() + r * deltar;
+		double	_r = _domain.rrange().min() + r * deltar;
 		if (debug) {
 			fprintf(stderr, "%s:%d: r = %d, _r = %f\n",
 				__FILE__, __LINE__, r, _r);
 		}
 		for (int phi = 0; phi < philimit; phi++) {
-			double	_phi = _f.phirange().min() + phi * deltaphi;
-			double	_x = _r * cos(_phi);
-			double	_y = _r * sin(_phi);
-			double	z = _f(_r, _phi);
-			add_vertex(B, _x, _y, z + _h/2);
-			add_vertex(B, _x, _y, z - _h/2);
+			double	_phi = _domain.phirange().min() + phi * deltaphi;
+			add_vertex(B, p(_r, _phi, _h));
+			add_vertex(B, p(_r, _phi, -_h));
 		}
 	}
 	if (contains0()) {
-		double	_z = _f(0, 0);
-		add_vertex(B, 0, 0, _z + _h/2);
-		add_vertex(B, 0, 0, _z - _h/2);	
+		add_vertex(B, p(0, 0, _h));
+		add_vertex(B, p(0, 0, -_h));
 	}
 }
 
@@ -71,7 +74,7 @@ void	Build_PolarCoordinatesSurface::add_vertices(Builder& B) {
  *
  * This method does not add the triangles along the border of the domain
  */
-void	Build_PolarCoordinatesSurface::add_surface_triangles(Builder& B) {
+void	Build_Polar::add_surface_triangles(Builder& B) {
 	if (debug) {
 		fprintf(stderr, "%s:%d: surface facets\n", __FILE__, __LINE__);
 	}
@@ -104,7 +107,7 @@ void	Build_PolarCoordinatesSurface::add_surface_triangles(Builder& B) {
 /**
  * \brief add fan triangles
  */
-void	Build_PolarCoordinatesSurface::add_surface_fan(Builder& B) {
+void	Build_Polar::add_surface_fan(Builder& B) {
 	if (!contains0()) {
 		if (debug) {
 			fprintf(stderr, "%s:%d: fan not needed\n",
@@ -127,7 +130,10 @@ void	Build_PolarCoordinatesSurface::add_surface_fan(Builder& B) {
 	}
 }
 
-void	Build_PolarCoordinatesSurface::add_radius_surface(Builder& B) {
+/**
+ * \brief add the facets along the radial borders
+ */
+void	Build_Polar::add_radius_surface(Builder& B) {
 	if (closed()) {
 		if (debug) {
 			fprintf(stderr, "%s:%d: radius surfaces not needed\n",
@@ -150,7 +156,7 @@ void	Build_PolarCoordinatesSurface::add_radius_surface(Builder& B) {
 			vertex(r + 1, 0    ) + 1,
 			vertex(r + 1, 0    )    );
 	}
-	if (_f.rrange().min() == 0) {
+	if (contains0()) {
 		add_facet(B,
 			vertex(0, 0) + 1,
 			vertex(0, 0)    ,
@@ -182,7 +188,10 @@ void	Build_PolarCoordinatesSurface::add_radius_surface(Builder& B) {
 	}
 }
 
-void	Build_PolarCoordinatesSurface::add_perimeter(Builder& B) {
+/**
+ * \brief add the inner and outer borders
+ */
+void	Build_Polar::add_perimeter(Builder& B) {
 	int	rimindex = _rsteps - ((contains0()) ? 1 : 0);
 	if (debug) {
 		fprintf(stderr, "%s:%d: outer surface\n", __FILE__, __LINE__);
@@ -218,7 +227,10 @@ void	Build_PolarCoordinatesSurface::add_perimeter(Builder& B) {
 	}
 }
 
-void	Build_PolarCoordinatesSurface::operator()(Polyhedron::HalfedgeDS& hds) {
+/**
+ * \brief create the polyhedron
+ */
+void	Build_Polar::operator()(Polyhedron::HalfedgeDS& hds) {
 	Builder	B(hds, true);
 	if (debug) {
 		fprintf(stderr, "%s:%d: start building surface\n",
@@ -235,6 +247,23 @@ void	Build_PolarCoordinatesSurface::operator()(Polyhedron::HalfedgeDS& hds) {
 			__FILE__, __LINE__);
 	}
 	B.end_surface();
+}
+
+/**
+ * \brief Get the point with parameter values r, phi and h
+ */
+point	Build_PolarFunction::p(double r, double phi, double h) {
+	double	x = r * cos(phi);
+	double	y = r * sin(phi);
+	double	z = _f(r, phi) + (h/2);
+	return point(x, y, z);
+}
+
+/**
+ * \brief Get the point with parameter values r, phi and h
+ */
+point	Build_PolarPointFunction::p(double r, double phi, double h) {
+	return _f.p(r, phi) + _f.v(r, phi) * (h/2);
 }
 
 } // namespace csg

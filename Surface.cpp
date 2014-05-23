@@ -16,6 +16,10 @@ void	Build_Surface::add_vertex(Builder& B, double x, double y, double z) {
 	_vertexnumber++;
 }
 
+void	Build_Surface::add_vertex(Builder& B, const point& p) {
+	add_vertex(B, p.x(), p.y(), p.z());
+}
+
 void	Build_Surface::add_facet(Builder& B, int a, int b, int c) {
 	if (debug) {
 		fprintf(stderr, "%s:%d: facet  %d (%d, %d, %d)\n",

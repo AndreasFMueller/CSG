@@ -24,6 +24,7 @@ public:
 		_facetnumber = 0;
 	}
 protected:
+	void	add_vertex(Builder& B, const point& p);
 	void	add_vertex(Builder& B, double x, double y, double z);
 	void	add_facet(Builder& B, int a, int b, int c);
 };
