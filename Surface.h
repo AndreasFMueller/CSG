@@ -10,6 +10,9 @@
 
 namespace csg {
 
+/**
+ * \brief Build a surface
+ */
 class Build_Surface : public CGAL::Modifier_base<Polyhedron::HalfedgeDS> {
 	int	_vertexnumber;
 public:

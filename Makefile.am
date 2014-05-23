@@ -12,7 +12,8 @@ libcsg_la_SOURCES = common.cpp						\
 	IcosahedralSphere.cpp						\
 	SphericalSphere.cpp						\
 	SphericalSurface.cpp						\
-	Arrow.cpp
+	Arrow.cpp							\
+	Curve.cpp
 
 include_HEADERS = common.h						\
 	Surface.h							\
@@ -21,7 +22,8 @@ include_HEADERS = common.h						\
 	IcosahedralSphere.h						\
 	SphericalSphere.h						\
 	SphericalSurface.h						\
-	Arrow.h
+	Arrow.h								\
+	Curve.h
 
 noinst_PROGRAMS = example1
 example1_SOURCES = example1.cpp
