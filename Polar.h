@@ -1,10 +1,10 @@
 /*
- * PolarCoordinatesSurface.h -- builder class for 
+ * Polar.h -- builder class for 
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
-#ifndef _PolarCoordinatesSurface_h
-#define _PolarCoordinatesSurface_h
+#ifndef _Polar_h
+#define _Polar_h
 
 #include <common.h>
 #include <Surface.h>
@@ -80,4 +80,4 @@ public:
 
 } // namespace csg
 
-#endif /* _PolarCoordinatesSurface_h */
+#endif /* _Polar_h */

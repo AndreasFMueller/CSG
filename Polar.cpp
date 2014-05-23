@@ -1,9 +1,9 @@
 /*
- * PolarCoordinatesSurface.cpp -- Create a surface in polar coordinates
+ * Polar.cpp -- Create a surface in polar coordinates
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
-#include <PolarCoordinatesSurface.h>
+#include <Polar.h>
 
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <math.h>

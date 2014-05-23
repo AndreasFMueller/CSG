@@ -1,9 +1,9 @@
 /*
- * CartesianCoordinatesSurface.cpp -- Create a surface in cartesian coordinates
+ * Cartesian.cpp -- Create a surface in cartesian coordinates
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
-#include <CartesianCoordinatesSurface.h>
+#include <Cartesian.h>
 
 namespace csg {
 

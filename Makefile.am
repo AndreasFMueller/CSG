@@ -7,8 +7,8 @@ lib_LTLIBRARIES = libcsg.la
 
 libcsg_la_SOURCES = common.cpp						\
 	Surface.cpp							\
-	CartesianCoordinatesSurface.cpp					\
-	PolarCoordinatesSurface.cpp					\
+	Cartesian.cpp							\
+	Polar.cpp							\
 	IcosahedralSphere.cpp						\
 	SphericalSphere.cpp						\
 	SphericalSurface.cpp						\
@@ -16,8 +16,8 @@ libcsg_la_SOURCES = common.cpp						\
 
 include_HEADERS = common.h						\
 	Surface.h							\
-	CartesianCoordinatesSurface.h					\
-	PolarCoordinatesSurface.h					\
+	Cartesian.h							\
+	Polar.h								\
 	IcosahedralSphere.h						\
 	SphericalSphere.h						\
 	SphericalSurface.h						\
@@ -29,3 +29,4 @@ example1_LDADD = libcsg.la
 
 test:	example1
 	time ./example1 -d -r 10 -n 2 > example1.off
+

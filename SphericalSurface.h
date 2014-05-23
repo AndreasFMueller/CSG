@@ -7,6 +7,7 @@
 #define _SphericalSurface_h
 
 #include <common.h>
+#include <Surface.h>
 
 namespace csg {
 
@@ -15,7 +16,7 @@ public:
 	virtual double	operator()(const double theta, const double phi) = 0;
 };
 
-class Build_SphericalSurface : public CGAL::Modifier_base<Polyhedron::HalfedgeDS> {
+class Build_SphericalSurface : public Build_Surface {
 	SphericalFunction&	_f;
 	int	_steps;
 public:

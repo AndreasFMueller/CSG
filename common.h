@@ -11,6 +11,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <math.h>
 
 extern int	debug;
 
@@ -53,9 +54,10 @@ public:
 	const double&	x() const { return _x; }
 	const double&	y() const { return _y; }
 	const double&	z() const { return _z; }
-	vector	operator*(double l) {
-		return vector(l * x(), l * y(), l * z());
-	}
+	vector	operator*(double l) const;
+	double	operator*(const vector& v) const;
+	double	norm() const;
+	vector	cross(const vector& v) const;
 };
 
 class point {

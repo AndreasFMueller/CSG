@@ -7,10 +7,11 @@
 #define _SphericalSphere_h
 
 #include <common.h>
+#include <Surface.h>
 
 namespace csg {
 
-class Build_SphericalSphere : public CGAL::Modifier_base<Polyhedron::HalfedgeDS> {
+class Build_SphericalSphere : public Build_Surface {
 	double	_radius;
 	int	_steps;
 public:

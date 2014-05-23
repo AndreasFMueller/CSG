@@ -1,10 +1,10 @@
 /*
- * CartesianCoordinatesSurface.h -- builder class for 
+ * Cartesian.h -- builder class for 
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
-#ifndef _CartesianCoordinatesSurface_h
-#define _CartesianCoordinatesSurface_h
+#ifndef _Cartesian_h
+#define _Cartesian_h
 
 #include <common.h>
 #include <Surface.h>
@@ -60,4 +60,4 @@ public:
 
 } // namespace csg
 
-#endif /* _CartesianCoordinatesSurface_h */
+#endif /* _Cartesian_h */

@@ -15,8 +15,8 @@
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 #include <SphericalSphere.h>
 #include <SphericalSurface.h>
-#include <CartesianCoordinatesSurface.h>
-#include <PolarCoordinatesSurface.h>
+#include <Cartesian.h>
+#include <Polar.h>
 
 namespace csg {
 
@@ -86,6 +86,7 @@ int	main(int argc, char *argv[]) {
 	// create spherical surfaces
 	Build_SphericalSphere	b1(radius, steps);
 	p1.delegate(b1);
+	fprintf(stderr, "sphere created\n");
 
 	Sine	sine(radius);
 	Build_SphericalSurface	b2(sine, 4 * steps);
@@ -111,12 +112,13 @@ int	main(int argc, char *argv[]) {
 
 	// convert to Nef polyhedra
 	Nef_polyhedron	n1(p1);
+	fprintf(stderr, "Nef_polyhedron created\n");
 	Nef_polyhedron	n2(p2);
 	Nef_polyhedron	n3(p3);
 	Nef_polyhedron	n4(p4);
 
 	n2.transform(translate);
-	Nef_polyhedron	difference(n3 - n4);
+	Nef_polyhedron	difference(n1 - n4);
 
 	// output difference
 	Polyhedron	P;

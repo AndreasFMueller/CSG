@@ -1,3 +1,7 @@
+20145024:
+	* rewrite all surface build classes on the bases of the Build_Surface
+	  class
+
 20140518:
 	* autotoolized
 
