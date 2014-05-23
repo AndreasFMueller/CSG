@@ -9,6 +9,6 @@ int	debug = 0;
 
 namespace csg {
 
-const Interval	Interval2Pi(0, M_PI);
+const Interval	Interval2Pi(0, 2 * M_PI);
 
 } // namespace csg

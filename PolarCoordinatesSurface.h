@@ -24,7 +24,10 @@ class Build_PolarCoordinatesSurface : public Build_Surface {
 	void	add_surface_fan(Builder& B);
 	void	add_radius_surface(Builder& B);
 	void	add_perimeter(Builder& B);
+
+	// information about the structure
 	bool	closed() const;
+	bool	contains0() const;
 
 	// methods used during creation
 	int	vertex(const int x, const int y) const;

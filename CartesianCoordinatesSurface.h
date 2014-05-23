@@ -7,16 +7,18 @@
 #define _CartesianCoordinatesSurface_h
 
 #include <common.h>
+#include <Surface.h>
 
 namespace csg {
 
-class Build_CartesianCoordinatesSurface : public CGAL::Modifier_base<Polyhedron::HalfedgeDS> {
+class Build_CartesianCoordinatesSurface : public Build_Surface {
 	CartesianFunction&	_f;
 	int	_xsteps, _ysteps;
 	double	_h;
 	int	vertex(const int x, const int y) const;
 public:
-	Build_CartesianCoordinatesSurface(CartesianFunction& f, int xsteps, int ysteps, double h)
+	Build_CartesianCoordinatesSurface(CartesianFunction& f,
+		int xsteps, int ysteps, double h)
 		: _f(f), _xsteps(xsteps), _ysteps(ysteps), _h(h) {
 	}
 	void	operator()(Polyhedron::HalfedgeDS& hds);
