@@ -37,10 +37,9 @@ public:
 /**
  * \brief Parabola
  */
-class	Parabola : public CartesianFunction {
+class	Parabola : public Function {
 public:
-	Parabola() : CartesianFunction(Interval(-10, 10), Interval(-10, 10)) {
-	}
+	Parabola() { }
 	double	operator()(const double x, const double y) {
 		return (x * x + y * y) / 20;
 	}
@@ -84,22 +83,25 @@ int	main(int argc, char *argv[]) {
 	// build a polygon 
 	Polyhedron	p1, p2, p3, p4;
 
-	// create all triangles of the sphere
-#if 0
+	// create spherical surfaces
 	Build_SphericalSphere	b1(radius, steps);
 	p1.delegate(b1);
+
 	Sine	sine(radius);
 	Build_SphericalSurface	b2(sine, 4 * steps);
 	p2.delegate(b2);
 
+	// cartesian surfaces
 	Parabola	parabola;
-	Build_CartesianCoordinatesSurface	b3(parabola, 2 * steps, 2 * steps, 1);
+	CartesianDomain	cartesiandomain(Interval(-10, 10), Interval(-10, 10));
+	Build_CartesianFunction	b3(parabola, cartesiandomain,
+					2 * steps, 2 * steps, 1);
 	p3.delegate(b3);
-#endif
 
+	// polar surfaces
 	Sine3	sine3;
 	PolarDomain	polardomain(Interval(1,5), Interval2Pi);
-	Build_PolarFunction	b4(sine3, polardomain, 10 * steps, 20 * steps, 0.1);
+	Build_PolarFunction	b4(sine3, polardomain, steps, 2 * steps, 0.1);
 	p4.delegate(b4);
 
 	// compute translation
@@ -108,20 +110,17 @@ int	main(int argc, char *argv[]) {
 	Aff_transformation	translate(CGAL::Translation(), d);
 
 	// convert to Nef polyhedra
-#if 0
 	Nef_polyhedron	n1(p1);
 	Nef_polyhedron	n2(p2);
 	Nef_polyhedron	n3(p3);
-#endif
 	Nef_polyhedron	n4(p4);
-#if 0
+
 	n2.transform(translate);
-	Nef_polyhedron	difference(n1 - n3);
-#endif
+	Nef_polyhedron	difference(n3 - n4);
 
 	// output difference
 	Polyhedron	P;
-	n4.convert_to_polyhedron(P);
+	difference.convert_to_polyhedron(P);
 	std::cout << P;
 
 	return EXIT_SUCCESS;

@@ -11,17 +11,51 @@
 
 namespace csg {
 
-class Build_CartesianCoordinatesSurface : public Build_Surface {
-	CartesianFunction&	_f;
+/**
+ * \brief Build surfaces parametrized by cartesian coordinate 
+ */
+class Build_Cartesian : public Build_Surface {
+	CartesianDomain	_domain;
+protected:
+	virtual point	p(double x, double y, double h) = 0;
+private:
 	int	_xsteps, _ysteps;
 	double	_h;
 	int	vertex(const int x, const int y) const;
 public:
-	Build_CartesianCoordinatesSurface(CartesianFunction& f,
+	Build_Cartesian(const CartesianDomain& domain,
 		int xsteps, int ysteps, double h)
-		: _f(f), _xsteps(xsteps), _ysteps(ysteps), _h(h) {
+		: _domain(domain), _xsteps(xsteps), _ysteps(ysteps), _h(h) {
 	}
 	void	operator()(Polyhedron::HalfedgeDS& hds);
+};
+
+/**
+ * \brief Create a surface based on a z-function
+ */
+class Build_CartesianFunction : public Build_Cartesian {
+	Function&	_f;
+protected:
+	virtual point	p(double x, double y, double h);
+public:
+	Build_CartesianFunction(Function& f, const CartesianDomain& domain,
+		int xsteps, int ysteps, double h)
+		: Build_Cartesian(domain, xsteps, ysteps, h), _f(f) {
+	}
+};
+
+/**
+ * \brief Create a surface basd on vector function with cartesian coordinates
+ */
+class Build_CartesianPointFunction : public Build_Cartesian {
+	PointFunction&	_f;
+protected:
+	virtual point	p(double x, double y, double h);
+public:
+	Build_CartesianPointFunction(PointFunction& f,
+		const CartesianDomain& domain, int xsteps, int ysteps, double h)
+		: Build_Cartesian(domain, xsteps, ysteps, h), _f(f) {
+	}
 };
 
 } // namespace csg

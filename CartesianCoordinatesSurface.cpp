@@ -5,26 +5,23 @@
  */
 #include <CartesianCoordinatesSurface.h>
 
-#include <CGAL/Polyhedron_incremental_builder_3.h>
-
 namespace csg {
 
-int	Build_CartesianCoordinatesSurface::vertex(const int x, const int y) const {
+int	Build_Cartesian::vertex(const int x, const int y) const {
 	return 2 * (x * (_ysteps + 1) + y);
 }
 
-void	Build_CartesianCoordinatesSurface::operator()(Polyhedron::HalfedgeDS& hds) {
-	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
+void	Build_Cartesian::operator()(Polyhedron::HalfedgeDS& hds) {
+	Builder	B(hds, true);
 	B.begin_surface(0, 0, 0);
-	double	deltax = _f.xrange().length() / _xsteps;
-	double	deltay = _f.yrange().length() / _ysteps;
+	double	deltax = _domain.xrange().length() / _xsteps;
+	double	deltay = _domain.yrange().length() / _ysteps;
 	for (int x = 0; x <= _xsteps; x++) {
-		double	_x = _f.xrange().min() + x * deltax;
+		double	_x = _domain.xrange().min() + x * deltax;
 		for (int y = 0; y <= _ysteps; y++) {
-			double	_y = _f.yrange().min() + y * deltay;
-			double	z = _f(_x, _y);
-			add_vertex(B, _x, _y, z + _h/2);
-			add_vertex(B, _x, _y, z - _h/2);
+			double	_y = _domain.yrange().min() + y * deltay;
+			add_vertex(B, p(_x, _y, _h/2));
+			add_vertex(B, p(_x, _y, -_h/2));
 		}
 	}
 	for (int x = 0; x < _xsteps; x++) {
@@ -97,6 +94,14 @@ void	Build_CartesianCoordinatesSurface::operator()(Polyhedron::HalfedgeDS& hds) 
 			vertex(_xsteps, y + 1)    );
 	}
 	B.end_surface();
+}
+
+point	Build_CartesianFunction::p(double x, double y, double h) {
+	return point(x, y, _f(x, y) + h/2);
+}
+
+point	Build_CartesianPointFunction::p(double x, double y, double h) {
+	return _f.p(x, y) + _f.v(x, y) * (h/2);
 }
 
 } // namespace csg
