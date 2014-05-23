@@ -10,6 +10,7 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Nef_polyhedron_3.h>
+#include <CGAL/Polyhedron_incremental_builder_3.h>
 
 extern int	debug;
 
@@ -21,6 +22,7 @@ typedef typename Polyhedron::HalfedgeDS::Vertex Vertex;
 typedef typename Vertex::Point  		Point;
 typedef CGAL::Nef_polyhedron_3<Kernel>		Nef_polyhedron;
 typedef Kernel::Aff_transformation_3		Aff_transformation;
+typedef CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	Builder;
 
 class Interval {
 	double	_min, _max;
@@ -31,6 +33,9 @@ public:
 	const double	length() const { return _max - _min; }
 	bool	operator==(const Interval& other) const {
 		return (_min == other.min()) && (_max == other.max());
+	}
+	bool	operator!=(const Interval& other) const {
+		return !(*this == other);
 	}
 };
 

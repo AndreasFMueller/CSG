@@ -6,6 +6,7 @@
 lib_LTLIBRARIES = libcsg.la
 
 libcsg_la_SOURCES = common.cpp						\
+	Surface.cpp							\
 	CartesianCoordinatesSurface.cpp					\
 	PolarCoordinatesSurface.cpp					\
 	IcosahedralSphere.cpp						\
@@ -14,6 +15,7 @@ libcsg_la_SOURCES = common.cpp						\
 	Arrow.cpp
 
 include_HEADERS = common.h						\
+	Surface.h							\
 	CartesianCoordinatesSurface.h					\
 	PolarCoordinatesSurface.h					\
 	IcosahedralSphere.h						\

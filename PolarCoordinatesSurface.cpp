@@ -9,114 +9,56 @@
 
 namespace csg {
 
-/**
- * \brief Vertex number for open0 surface
- */
-int	Build_PolarCoordinatesSurface::open0_vertex(const int r, const int phi) const {
-	return 2 * (r * (_phisteps + 1) + phi);
+bool	Build_PolarCoordinatesSurface::closed() const {
+	return (_f.phirange() == Interval2Pi) ? true : false;
 }
 
 /**
  * \brief Vertex number for open surface
  */
-int	Build_PolarCoordinatesSurface::open_vertex(const int r, const int phi) const {
-	return 2 * (r * (_phisteps + 1) + phi);
-}
-
-/**
- * \brief Vertex number for closed0 surface
- */
-int	Build_PolarCoordinatesSurface::closed0_vertex(const int r, const int phi) const {
-	return 0;
-}
-
-/**
- * \brief Vertex number for closed surface
- */
-int	Build_PolarCoordinatesSurface::closed_vertex(const int r, const int phi) const {
-	return 0;
-}
-
-/**
- * \brief create a closed0 surface
- */
-void	Build_PolarCoordinatesSurface::closed0_surface(Polyhedron::HalfedgeDS& hds) {
-	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
-	B.begin_surface(0, 0, 0);
-	add_vertices(B);
-	if (debug) {
-		fprintf(stderr, "%s:%d: facets\n", __FILE__, __LINE__);
+int	Build_PolarCoordinatesSurface::vertex(const int r, const int phi) const {
+	if (closed()) {
+		int	p = phi;
+		if (phi == _phisteps - 1) {
+			p = 0;
+		}
+		return 2 * (r * (_phisteps - 1) + p);
 	}
-	B.end_surface();
+	return 2 * (r * _phisteps + phi);
 }
 
 /**
  * \brief add vertices (common to all surfaces)
  */
-void	Build_PolarCoordinatesSurface::add_vertices(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B) {
+void	Build_PolarCoordinatesSurface::add_vertices(Builder& B) {
 	if (debug) {
 		fprintf(stderr, "%s:%d: vertices\n", __FILE__, __LINE__);
 	}
-	int	philimit = (_f.phirange() == Interval2Pi) ? (_phisteps - 1)
-							:_phisteps;
+	int	philimit = closed() ? (_phisteps - 1) : _phisteps;
+	if (debug) {
+		fprintf(stderr, "%s:%d: philimit: %d (_phisteps = %d)\n",
+			__FILE__, __LINE__, philimit, _phisteps);
+	}
 	for (int r = 0; r <= _rsteps; r++) {
 		double	_r = _f.rrange().min() + r * deltar;
+		if (debug) {
+			fprintf(stderr, "%s:%d: r = %d, _r = %f\n",
+				__FILE__, __LINE__, r, _r);
+		}
 		for (int phi = 0; phi < philimit; phi++) {
 			double	_phi = _f.phirange().min() + phi * deltaphi;
 			double	_x = _r * cos(_phi);
 			double	_y = _r * sin(_phi);
 			double	z = _f(_r, _phi);
-			if (debug) {
-				fprintf(stderr, "%s:%d: %d (%f, %f, %f)\n",
-					__FILE__, __LINE__, vertexnumber,
-					_x, _y, z + _h/2);
-				fprintf(stderr, "%s:%d: %d (%f, %f, %f)\n",
-					__FILE__, __LINE__, vertexnumber,
-					_x, _y, z - _h/2);
-			}
-			B.add_vertex(Point(_x, _y, z + _h/2));
-			B.add_vertex(Point(_x, _y, z - _h/2));
-			vertexnumber += 2;
+			add_vertex(B, _x, _y, z + _h/2);
+			add_vertex(B, _x, _y, z - _h/2);
 		}
 	}
 	if (_f.rrange().min() == 0) {
 		double	_z = _f(0, 0);
-		if (debug) {
-			fprintf(stderr, "%s:%d: %d (0, 0, %f)\n",
-				__FILE__, __LINE__, vertexnumber, _z + _h/2);
-			fprintf(stderr, "%s:%d: %d (0, 0, %f)\n",
-				__FILE__, __LINE__, vertexnumber + 1, _z - _h/2);
-		}
-		B.add_vertex(Point(0, 0, _z + _h/2));
-		B.add_vertex(Point(0, 0, _z - _h/2));	
-		vertexnumber += 2;
+		add_vertex(B, 0, 0, _z + _h/2);
+		add_vertex(B, 0, 0, _z - _h/2);	
 	}
-}
-
-/**
- * \brief create a closed surface
- */
-void	Build_PolarCoordinatesSurface::closed_surface(Polyhedron::HalfedgeDS& hds) {
-	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
-	B.begin_surface(0, 0, 0);
-	add_vertices(B);
-	if (debug) {
-		fprintf(stderr, "%s:%d: facets\n", __FILE__, __LINE__);
-	}
-	B.end_surface();
-}
-
-/**
- * \brief create an open0 surface
- */
-void	Build_PolarCoordinatesSurface::open0_surface(Polyhedron::HalfedgeDS& hds) {
-	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
-	B.begin_surface(0, 0, 0);
-	add_vertices(B);
-	if (debug) {
-		fprintf(stderr, "%s:%d: facets\n", __FILE__, __LINE__);
-	}
-	B.end_surface();
 }
 
 /**
@@ -124,222 +66,159 @@ void	Build_PolarCoordinatesSurface::open0_surface(Polyhedron::HalfedgeDS& hds) {
  *
  * This method does not add the triangles along the border of the domain
  */
-void	Build_PolarCoordinatesSurface::add_surface_triangles(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B) {
-	facenumber = 0;
+void	Build_PolarCoordinatesSurface::add_surface_triangles(Builder& B) {
 	if (debug) {
 		fprintf(stderr, "%s:%d: surface facets\n", __FILE__, __LINE__);
 	}
 	for (int r = 0; r < _rsteps; r++) {
-		for (int phi = 0; phi < _phisteps; phi++) {
-			if (debug) {
-				fprintf(stderr, "%s:%d: r = %d, phi = %d\n",
-					__FILE__, __LINE__, r, phi);
-				fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-					__FILE__, __LINE__, facenumber,
-					open_vertex(r    , phi    ),
-					open_vertex(r + 1, phi    ),
-					open_vertex(r    , phi + 1));
-			}
-			B.begin_facet();
-			B.add_vertex_to_facet(open_vertex(r    , phi    )    );
-			B.add_vertex_to_facet(open_vertex(r + 1, phi    )    );
-			B.add_vertex_to_facet(open_vertex(r    , phi + 1)    );
-			B.end_facet();
-			facenumber++;
+		for (int phi = 0; phi < _phisteps - 1; phi++) {
+			add_facet(B,
+				vertex(r    , phi    ),
+				vertex(r + 1, phi    ),
+				vertex(r    , phi + 1));
 
-			if (debug) {
-				fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-					__FILE__, __LINE__, facenumber,
-					open_vertex(r + 1, phi    )    ,
-					open_vertex(r + 1, phi + 1)    ,
-					open_vertex(r    , phi + 1)    );
-			}
-			B.begin_facet();
-			B.add_vertex_to_facet(open_vertex(r + 1, phi    )    );
-			B.add_vertex_to_facet(open_vertex(r + 1, phi + 1)    );
-			B.add_vertex_to_facet(open_vertex(r    , phi + 1)    );
-			B.end_facet();
-			facenumber++;
+			add_facet(B,
+				vertex(r + 1, phi    )    ,
+				vertex(r + 1, phi + 1)    ,
+				vertex(r    , phi + 1)    );
 
-			if (debug) {
-				fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-					__FILE__, __LINE__, facenumber,
-					open_vertex(r    , phi    ) + 1,
-					open_vertex(r    , phi + 1) + 1,
-					open_vertex(r + 1, phi    ) + 1);
-			}
-			B.begin_facet();
-			B.add_vertex_to_facet(open_vertex(r    , phi    ) + 1);
-			B.add_vertex_to_facet(open_vertex(r    , phi + 1) + 1);
-			B.add_vertex_to_facet(open_vertex(r + 1, phi    ) + 1);
-			B.end_facet();
-			facenumber++;
+			add_facet(B,
+				vertex(r    , phi    ) + 1,
+				vertex(r    , phi + 1) + 1,
+				vertex(r + 1, phi    ) + 1);
 
-			if (debug) {
-				fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-					__FILE__, __LINE__, facenumber,
-				open_vertex(r + 1, phi    ) + 1,
-				open_vertex(r    , phi + 1) + 1,
-				open_vertex(r + 1, phi + 1) + 1);
-			}
-			B.begin_facet();
-			B.add_vertex_to_facet(open_vertex(r + 1, phi    ) + 1);
-			B.add_vertex_to_facet(open_vertex(r    , phi + 1) + 1);
-			B.add_vertex_to_facet(open_vertex(r + 1, phi + 1) + 1);
-			B.end_facet();
-			facenumber++;
+			add_facet(B,
+				vertex(r + 1, phi    ) + 1,
+				vertex(r    , phi + 1) + 1,
+				vertex(r + 1, phi + 1) + 1);
 		}
 	}
 }
 
-
 /**
- * \brief create an open surface
+ * \brief add fan triangles
  */
-void	Build_PolarCoordinatesSurface::open_surface(Polyhedron::HalfedgeDS& hds) {
-	CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	B(hds, true);
-	B.begin_surface(0, 0, 0);
-	add_vertices(B);
-	add_surface_triangles(B);
+void	Build_PolarCoordinatesSurface::add_surface_fan(Builder& B) {
+	if (_f.rrange().min() != 0) {
+		if (debug) {
+			fprintf(stderr, "%s:%d: fan not needed\n",
+				__FILE__, __LINE__);
+		}
+		return;
+	}
+	for (int phi = 0; phi < _phisteps - 1; phi++) {
+		add_facet(B,
+			vertexnumber() - 1,
+			vertex(0, phi),
+			vertex(0, phi + 1));
+		add_facet(B,
+			vertexnumber() - 1,
+			vertex(0, phi + 1) + 1,
+			vertex(0, phi) + 1);
+	}
+}
+
+void	Build_PolarCoordinatesSurface::add_radius_surface(Builder& B) {
 	if (debug) {
-		fprintf(stderr, "%s:%d: radiant surfaces\n",
+		fprintf(stderr, "%s:%d: radius surfaces\n",
 			__FILE__, __LINE__);
 	}
 	for (int r = 0; r < _rsteps; r++) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: r = %d\n",
-				__FILE__, __LINE__, r);
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(r    , 0    )    ,
-				open_vertex(r    , 0    ) + 1,
-				open_vertex(r + 1, 0    )    );
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(r    , 0    )    );
-		B.add_vertex_to_facet(open_vertex(r    , 0    ) + 1);
-		B.add_vertex_to_facet(open_vertex(r + 1, 0    )    );
-		B.end_facet();
-		facenumber++;
-		if (debug) {
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(r    , 0    ) + 1,
-				open_vertex(r + 1, 0    ) + 1,
-				open_vertex(r + 1, 0    )    );
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(r    , 0    ) + 1);
-		B.add_vertex_to_facet(open_vertex(r + 1, 0    ) + 1);
-		B.add_vertex_to_facet(open_vertex(r + 1, 0    )    );
-		B.end_facet();
-		facenumber++;
-		if (debug) {
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(r    , _phisteps)    ,
-				open_vertex(r + 1, _phisteps)    ,
-				open_vertex(r    , _phisteps) + 1);
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(r    , _phisteps)    );
-		B.add_vertex_to_facet(open_vertex(r + 1, _phisteps)    );
-		B.add_vertex_to_facet(open_vertex(r    , _phisteps) + 1);
-		B.end_facet();
-		facenumber++;
-		if (debug) {
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(r + 1, _phisteps)    ,
-				open_vertex(r + 1, _phisteps) + 1,
-				open_vertex(r    , _phisteps) + 1);
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(r + 1, _phisteps)    );
-		B.add_vertex_to_facet(open_vertex(r + 1, _phisteps) + 1);
-		B.add_vertex_to_facet(open_vertex(r    , _phisteps) + 1);
-		B.end_facet();
-		facenumber++;
+		add_facet(B,
+			vertex(r    , 0    )    ,
+			vertex(r    , 0    ) + 1,
+			vertex(r + 1, 0    )    );
+		add_facet(B,
+			vertex(r    , 0    ) + 1,
+			vertex(r + 1, 0    ) + 1,
+			vertex(r + 1, 0    )    );
 	}
+	if (_f.rrange().min() == 0) {
+		add_facet(B,
+			vertex(0, 0)    ,
+			vertex(0, 0) + 1,
+			vertexnumber() - 2);
+		add_facet(B,
+			vertex(0, 0) + 1,
+			vertexnumber() - 1,
+			vertexnumber() - 2);
+	}
+	if (closed()) {
+		for (int r = 0; r < _rsteps; r++) {
+			add_facet(B,
+				vertex(r    , _phisteps - 1)    ,
+				vertex(r + 1, _phisteps - 1)    ,
+				vertex(r    , _phisteps - 1) + 1);
+			add_facet(B,
+				vertex(r + 1, _phisteps - 1)    ,
+				vertex(r + 1, _phisteps - 1) + 1,
+				vertex(r    , _phisteps - 1) + 1);
+		}
+		if (_f.rrange().min() == 0) {
+			add_facet(B,
+				vertex(0, _phisteps - 1)    ,
+				vertex(0, _phisteps - 1) + 1,
+				vertexnumber() - 2);
+			add_facet(B,
+				vertex(0, _phisteps - 1) + 1,
+				vertexnumber() - 1,
+				vertexnumber() - 2);
+		}
+	}
+}
+
+void	Build_PolarCoordinatesSurface::add_perimeter(Builder& B) {
 	if (debug) {
 		fprintf(stderr, "%s:%d: outer surface\n", __FILE__, __LINE__);
 	}
-	for (int phi = 0; phi < _phisteps; phi++) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: phi = %d\n",
-				__FILE__, __LINE__, phi);
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(_rsteps, phi    )    ,
-				open_vertex(_rsteps, phi    ) + 1,
-				open_vertex(_rsteps, phi + 1) + 1);
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(_rsteps, phi    )    );
-		B.add_vertex_to_facet(open_vertex(_rsteps, phi    ) + 1);
-		B.add_vertex_to_facet(open_vertex(_rsteps, phi + 1) + 1);
-		B.end_facet();
-		facenumber++;
+	for (int phi = 0; phi < _phisteps - 1; phi++) {
+		add_facet(B,
+			vertex(_rsteps, phi    )    ,
+			vertex(_rsteps, phi    ) + 1,
+			vertex(_rsteps, phi + 1) + 1);
 
-		if (debug) {
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(_rsteps, phi    )    ,
-				open_vertex(_rsteps, phi + 1) + 1,
-				open_vertex(_rsteps, phi + 1)    );
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(_rsteps, phi    )    );
-		B.add_vertex_to_facet(open_vertex(_rsteps, phi + 1) + 1);
-		B.add_vertex_to_facet(open_vertex(_rsteps, phi + 1)    );
-		B.end_facet();
-		facenumber++;
-
-		if (debug) {
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(0, phi    )    ,
-				open_vertex(0, phi + 1)    ,
-				open_vertex(0, phi    ) + 1);
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(0, phi    )    );
-		B.add_vertex_to_facet(open_vertex(0, phi + 1)    );
-		B.add_vertex_to_facet(open_vertex(0, phi    ) + 1);
-		B.end_facet();
-		facenumber++;
-
-		if (debug) {
-			fprintf(stderr, "%s:%d: %d (%d, %d, %d)\n",
-				__FILE__, __LINE__, facenumber,
-				open_vertex(0, phi + 1)    ,
-				open_vertex(0, phi + 1) + 1,
-				open_vertex(0, phi    ) + 1);
-		}
-		B.begin_facet();
-		B.add_vertex_to_facet(open_vertex(0, phi + 1)    );
-		B.add_vertex_to_facet(open_vertex(0, phi + 1) + 1);
-		B.add_vertex_to_facet(open_vertex(0, phi    ) + 1);
-		B.end_facet();
-		facenumber++;
+		add_facet(B,
+			vertex(_rsteps, phi    )    ,
+			vertex(_rsteps, phi + 1) + 1,
+			vertex(_rsteps, phi + 1)    );
 	}
-	B.end_surface();
+
+	if (_f.rrange().min() != 0) {
+		if (debug) {
+			fprintf(stderr, "%s:%d: inner surface\n",
+				__FILE__, __LINE__);
+		}
+		for (int phi = 0; phi < _phisteps - 1; phi++) {
+			add_facet(B,
+				vertex(0, phi    )    ,
+				vertex(0, phi + 1)    ,
+				vertex(0, phi    ) + 1);
+
+			add_facet(B,
+				vertex(0, phi + 1)    ,
+				vertex(0, phi + 1) + 1,
+				vertex(0, phi    ) + 1);
+		}
+	}
 }
 
 void	Build_PolarCoordinatesSurface::operator()(Polyhedron::HalfedgeDS& hds) {
-	if (_f.phirange() == Interval2Pi) {
-		if (_f.rrange().min() == 0) {
-			return closed0_surface(hds);
-		} else {
-			return closed_surface(hds);
-		}
-	} else {
-		if (_f.rrange().min() == 0) {
-			return open0_surface(hds);
-		} else {
-			return open_surface(hds);
-		}
+	Builder	B(hds, true);
+	if (debug) {
+		fprintf(stderr, "%s:%d: start building surface\n",
+			__FILE__, __LINE__);
 	}
+	B.begin_surface(0, 0, 0);
+	add_vertices(B);
+	add_surface_triangles(B);
+	add_surface_fan(B);
+	add_radius_surface(B);
+	add_perimeter(B);
+	if (debug) {
+		fprintf(stderr, "%s:%d: all factes added\n",
+			__FILE__, __LINE__);
+	}
+	B.end_surface();
 }
 
 } // namespace csg

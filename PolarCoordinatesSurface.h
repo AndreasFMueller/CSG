@@ -7,39 +7,33 @@
 #define _PolarCoordinatesSurface_h
 
 #include <common.h>
+#include <Surface.h>
 
 namespace csg {
 
-class Build_PolarCoordinatesSurface
-	: public CGAL::Modifier_base<Polyhedron::HalfedgeDS> {
+class Build_PolarCoordinatesSurface : public Build_Surface {
 	PolarFunction&	_f;
 	int	_rsteps, _phisteps;
 	double	_h;
 	// members used during constrution
 	double	deltar, deltaphi;
 	double	_phi, _r;
-	int	vertexnumber;
-	int	facenumber;
 	// add vertices
-	void	add_vertices(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B);
-	void	add_surface_triangles(CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>& B);
+	void	add_vertices(Builder& B);
+	void	add_surface_triangles(Builder& B);
+	void	add_surface_fan(Builder& B);
+	void	add_radius_surface(Builder& B);
+	void	add_perimeter(Builder& B);
+	bool	closed() const;
 
 	// methods used during creation
-	int	open_vertex(const int x, const int y) const;
-	int	open0_vertex(const int x, const int y) const;
-	int	closed_vertex(const int x, const int y) const;
-	int	closed0_vertex(const int x, const int y) const;
-	void	open_surface(Polyhedron::HalfedgeDS& hds);
-	void	open0_surface(Polyhedron::HalfedgeDS& hds);
-	void	closed_surface(Polyhedron::HalfedgeDS& hds);
-	void	closed0_surface(Polyhedron::HalfedgeDS& hds);
+	int	vertex(const int x, const int y) const;
 public:
 	Build_PolarCoordinatesSurface(PolarFunction& f, int rsteps,
 		int phisteps, double h)
 		: _f(f), _rsteps(rsteps), _phisteps(phisteps), _h(h) {
 		deltar = _f.rrange().length() / _rsteps;
 		deltaphi = _f.phirange().length() / _phisteps;
-		vertexnumber = 0;
 	}
 	void	operator()(Polyhedron::HalfedgeDS& hds);
 };

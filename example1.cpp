@@ -86,6 +86,7 @@ int	main(int argc, char *argv[]) {
 	Polyhedron	p1, p2, p3, p4;
 
 	// create all triangles of the sphere
+#if 0
 	Build_SphericalSphere	b1(radius, steps);
 	p1.delegate(b1);
 	Sine	sine(radius);
@@ -95,6 +96,7 @@ int	main(int argc, char *argv[]) {
 	Parabola	parabola;
 	Build_CartesianCoordinatesSurface	b3(parabola, 2 * steps, 2 * steps, 1);
 	p3.delegate(b3);
+#endif
 
 	Sine3	sine3;
 	Build_PolarCoordinatesSurface	b4(sine3, 2 * steps, 2 * steps, 0.1);
