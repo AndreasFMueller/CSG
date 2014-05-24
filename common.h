@@ -47,17 +47,43 @@ public:
 	virtual double	operator()(const double, const double) = 0;
 };
 
+class point;
+
 class vector {
 	double	_x, _y, _z;
 public:
+	vector() : _x(0), _y(0), _z(0) { }
 	vector(double x, double y, double z) : _x(x), _y(y), _z(z) { }
+	vector(const point& from, const point& to);
 	const double&	x() const { return _x; }
 	const double&	y() const { return _y; }
 	const double&	z() const { return _z; }
-	vector	operator*(double l) const;
+	vector	operator+(const vector& v) const;
+	vector	operator-(const vector& v) const;
+	vector	operator/(double l) const;
 	double	operator*(const vector& v) const;
 	double	norm() const;
 	vector	cross(const vector& v) const;
+	static const vector	e1;
+	static const vector	e2;
+	static const vector	e3;
+	friend vector	operator*(double l, const vector& v);
+	friend vector	operator*(const vector& v, double l);
+};
+
+vector	operator*(double l, const vector& v);
+vector	operator*(const vector& v, double l);
+
+class frame {
+	vector	_v1, _v2, _v3;
+	void	orthogonalize(const vector& n);
+public:
+	const vector&	v1() const { return _v1; }
+	const vector&	v2() const { return _v2; }
+	const vector&	v3() const { return _v3; }
+public:
+	frame(const vector& t);
+	frame(const vector& t, const vector& n);
 };
 
 class point {
@@ -69,6 +95,9 @@ public:
 	const double&	z() const { return _z; }
 	point	operator+(const vector& other) {
 		return point(_x + other.x(), _y + other.y(), _z + other.z());
+	}
+	point	operator-(const vector& other) {
+		return point(_x - other.x(), _y - other.y(), _z - other.z());
 	}
 };
 
@@ -100,18 +129,6 @@ public:
 	const Interval&	yrange() const { return _yrange; }
 };
 
-class CartesianFunction : public Function, public CartesianDomain {
-public:
-	CartesianFunction(const Interval& xrange, const Interval& yrange)
-		: CartesianDomain(xrange, yrange) { }
-};
-
-class CartesianPointFunction : public PointFunction, public CartesianDomain {
-public:
-	CartesianPointFunction(const Interval& xrange, const Interval& yrange)
-		: CartesianDomain(xrange, yrange) { }
-};
-
 class PolarDomain {
 	Interval	_rrange;
 	Interval	_phirange;
@@ -120,18 +137,6 @@ public:
 		: _rrange(rrange), _phirange(phirange) { }
 	const Interval&	rrange() const { return _rrange; }
 	const Interval&	phirange() const { return _phirange; }
-};
-
-class PolarFunction : public Function, public PolarDomain {
-public:
-	PolarFunction(const Interval& rrange, const Interval& phirange)
-		: PolarDomain(rrange, phirange) { }
-};
-
-class PolarPointFunction : public PointFunction, public PolarDomain {
-public:
-	PolarPointFunction(const Interval& rrange, const Interval& phirange)
-		: PolarDomain(rrange, phirange) { }
 };
 
 } // namespace csg
