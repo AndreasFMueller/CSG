@@ -15,24 +15,35 @@ namespace csg {
  * \brief Base class for curves
  */
 class CurveFunction {
+	double	_deltat;
 public:
-	virtual point	operator()(double t) const = 0;
+	CurveFunction(double deltat = 0) : _deltat(deltat) { }
+
+	const double&	deltat() const { return _deltat; }
+	void	deltat(double d) { _deltat = d; }
+
+	virtual point	position(double t) const = 0;
+
+	virtual vector	tangent(double t) const;
+	virtual vector	normal(double t) const;
+	frame	frenetframe(double t) const;
 };
 
 /**
  * \brief Class to build space curves
  */
-class Curve : public Build_Surface {
+class Build_Curve : public Build_Surface {
 	CurveFunction&	_f;
 	Interval	_interval;
 	int	_steps;
-	int	_tsteps;
+	int	_phisteps;
 	double	_r;
+	int	vertex(int t, int phi) const;
 public:
-	Curve(CurveFunction& f, const Interval& interval,
-		int steps, int tsteps, double r)
+	Build_Curve(CurveFunction& f, const Interval& interval,
+		int steps, int phisteps, double r)
 		: _f(f), _interval(interval),
-		_steps(steps), _tsteps(tsteps), _r(r) {
+		_steps(steps), _phisteps(phisteps), _r(r) {
 	}
 	void	operator()(Polyhedron::HalfedgeDS& hds);
 };

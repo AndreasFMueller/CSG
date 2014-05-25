@@ -63,12 +63,14 @@ public:
 	vector	operator/(double l) const;
 	double	operator*(const vector& v) const;
 	double	norm() const;
+	vector	normalized() const;
 	vector	cross(const vector& v) const;
 	static const vector	e1;
 	static const vector	e2;
 	static const vector	e3;
 	friend vector	operator*(double l, const vector& v);
 	friend vector	operator*(const vector& v, double l);
+	vector	orthogonalto(const vector& v) const;
 };
 
 vector	operator*(double l, const vector& v);

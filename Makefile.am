@@ -25,7 +25,7 @@ include_HEADERS = common.h						\
 	Arrow.h								\
 	Curve.h
 
-noinst_PROGRAMS = example1 example2
+noinst_PROGRAMS = example1 example2 example3
 
 example1_SOURCES = example1.cpp
 example1_LDADD = libcsg.la
@@ -33,8 +33,14 @@ example1_LDADD = libcsg.la
 example2_SOURCES = example2.cpp
 example2_LDADD = libcsg.la
 
+example3_SOURCES = example3.cpp
+example3_LDADD = libcsg.la
+
 test:	example1
 	time ./example1 -d -r 10 -n 2 > example1.off
 
 test2:	example2
 	time ./example2 -d -n 50 > example2.off
+
+test3:	example3
+	time ./example3 -d -n 200 -s 32 > example3.off

@@ -27,6 +27,15 @@ double	vector::norm() const {
 	return sqrt(_x * _x + _y * _y + _z * _z);
 }
 
+vector	vector::normalized() const {
+	return (*this) / norm();
+}
+
+vector	vector::orthogonalto(const vector& base) const {
+	vector	e = base.normalized();
+	return (*this) - ((*this) * e) * e;
+}
+
 double	vector::operator*(const vector& v) const {
 	return v.x() * _x + v.y() * _y + v.z() * _z;
 }
@@ -56,7 +65,7 @@ const vector	vector::e2(0, 1, 0);
 const vector	vector::e3(0, 0, 1);
 
 void	frame::orthogonalize(const vector& n) {
-	_v2 = n - _v1 * (n * _v1);
+	_v2 = n.orthogonalto(_v1);
 	if (0 == _v2.norm()) {
 		throw std::runtime_error("normal vector has norm 0");
 	}

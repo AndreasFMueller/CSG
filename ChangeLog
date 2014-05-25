@@ -1,5 +1,6 @@
 20140525:
 	* add arrow implementation
+	* add curve implementation
 
 20140524:
 	* rewrite all surface build classes on the bases of the Build_Surface
