@@ -1,5 +1,5 @@
 /*
- * example3.cpp -- example 3, helix
+ * example4.cpp -- example 4, straight lines
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
@@ -8,41 +8,20 @@
 #include <getopt.h>
 #include <iostream>
 #include <common.h>
-#include <Curve.h>
+#include <Line.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 
 namespace csg {
 
-class Helix : public CurveFunction {
-	double	_radius;
-	double	_a;
-public:
-	Helix(double radius, double a)
-		: CurveFunction(), _radius(radius), _a(a) { }
-
-	virtual point	position(double t) const {
-		return point(_radius * cos(t), _radius * sin(t), _a * t);
-	}
-
-	virtual vector	tangent(double t) const {
-		return vector(-_radius * sin(t), _radius * cos(t), _a);
-	}
-
-	virtual vector	normal(double t) const {
-		return vector(-cos(t), -sin(t), 0);
-	}
-};
-
 /** 
- * \brief main function for example3
+ * \brief main function for example4
  */
 int	main(int argc, char *argv[]) {
 	int	c;
-	int	steps = 100;
 	int	phisteps = 4;
 	double	radius = 0.1;
-	while (EOF != (c = getopt(argc, argv, "r:dn:s:")))
+	while (EOF != (c = getopt(argc, argv, "r:ds:")))
 		switch (c) {
 		case 'd':
 			debug++;
@@ -50,31 +29,38 @@ int	main(int argc, char *argv[]) {
 		case 'r':
 			radius = atof(optarg);
 			break;
-		case 'n':
-			steps = atoi(optarg);
-			break;
 		case 's':
 			phisteps = atoi(optarg);
 			break;
 		}
 
 	if (debug) {
-		fprintf(stderr, "%s:%d: arrow of radius %f\n",
+		fprintf(stderr, "%s:%d: 3 lines of radius %f\n",
 			__FILE__, __LINE__, radius);
 	}
 
 	// build a polygon 
-	Polyhedron	p1;
+	Polyhedron	p1, p2, p3;
 
 	// create a curve
-	Interval	threeturns(0, 6 * M_PI);
-	Helix	helix(1, 2 / threeturns.length());
-	Build_Curve	b1(helix, threeturns, steps, phisteps, radius);
+	Interval	interval(-1, 2);
+	Line	l1(point(), point(1,0,0));
+	Line	l2(point(), point(0,1,0));
+	Line	l3(point(), point(0,0,1));
+	Build_Line	b1(l1, interval, phisteps, radius);
+	Build_Line	b2(l2, interval, phisteps, radius);
+	Build_Line	b3(l3, interval, phisteps, radius);
 	p1.delegate(b1);
-	fprintf(stderr, "curve created\n");
+	p2.delegate(b2);
+	p3.delegate(b3);
+	fprintf(stderr, "lines created\n");
 
 	// convert to Nef polyhedra
 	Nef_polyhedron	n1(p1);
+	Nef_polyhedron	n2(p2);
+	n1 = n1 + n2;
+	Nef_polyhedron	n3(p3);
+	n1 = n1 + n3;
 
 	// output difference
 	Polyhedron	P;

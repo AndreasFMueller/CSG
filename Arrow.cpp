@@ -21,7 +21,7 @@ void	Build_Arrow::operator()(Polyhedron::HalfedgeDS& hds) {
 	// create the frame
 	vector	t(_from, _to);
 	frame	f(t);
-	point	head = _to - (2 * _radius) * f.v1();
+	point	head = _to - (3 * _radius) * f.v1();
 
 	double	deltaphi = 2 * M_PI / _steps;
 	for (int phi = 0; phi < _steps; phi++) {

@@ -1,5 +1,5 @@
 /*
- * example1.cpp -- example 1
+ * example1.cpp -- example 1, spheres and surfaces
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */

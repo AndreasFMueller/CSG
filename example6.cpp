@@ -1,5 +1,5 @@
 /*
- * example2.cpp -- example 2, arrow
+ * example6.cpp -- example 6, Box
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
@@ -8,46 +8,37 @@
 #include <getopt.h>
 #include <iostream>
 #include <common.h>
-#include <Arrow.h>
+#include <Box.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 
 namespace csg {
 
 /** 
- * \brief main function for example2
+ * \brief main function for example6
  */
 int	main(int argc, char *argv[]) {
 	int	c;
-	int	steps = 16;
-	double	radius = 0.1;
-	while (EOF != (c = getopt(argc, argv, "r:dn:")))
+	while (EOF != (c = getopt(argc, argv, "d")))
 		switch (c) {
 		case 'd':
 			debug++;
 			break;
-		case 'r':
-			radius = atof(optarg);
-			break;
-		case 'n':
-			steps = atoi(optarg);
-			break;
 		}
 
 	if (debug) {
-		fprintf(stderr, "%s:%d: arrow of radius %f\n",
-			__FILE__, __LINE__, radius);
+		fprintf(stderr, "%s:%d: box\n", __FILE__, __LINE__ );
 	}
 
 	// build a polygon 
 	Polyhedron	p1;
 
 	// create spherical surfaces
-	point	from(0, 0, 0);
-	point	to(0, 0, 1);
-	Build_Arrow	b1(from, to, radius, steps);
+	point	from(-1, -2, -1.5);
+	point	to(1, 2, 1.5);
+	Build_Box	b1(from, to);
 	p1.delegate(b1);
-	fprintf(stderr, "arrow created\n");
+	fprintf(stderr, "Box created\n");
 
 	// convert to Nef polyhedra
 	Nef_polyhedron	n1(p1);

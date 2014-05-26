@@ -33,7 +33,8 @@ vector	vector::normalized() const {
 
 vector	vector::orthogonalto(const vector& base) const {
 	vector	e = base.normalized();
-	return (*this) - ((*this) * e) * e;
+	vector	result = (*this) - ((*this) * e) * e;
+	return result;
 }
 
 double	vector::operator*(const vector& v) const {
@@ -84,9 +85,11 @@ frame::frame(const vector& t) {
 	_v1 = t / t.norm();
 	try {
 		orthogonalize(vector::e1);
+		return;
 	} catch (...) { }
 	try {
 		orthogonalize(vector::e2);
+		return;
 	} catch (...) { }
 	orthogonalize(vector::e3);
 }
