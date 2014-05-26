@@ -60,6 +60,13 @@ vector::vector(const point& from, const point& to)
 	: _x(to.x() - from.x()), _y(to.y() - from.y()), _z(to.z() - from.z()) {
 }
 
+bool	vector::parallel(const vector& v) const {
+	if (0 == cross(v).norm()) {
+		return true;
+	}
+	return false;
+}
+
 const vector	vector::e1(1, 0, 0);
 const vector	vector::e2(0, 1, 0);
 const vector	vector::e3(0, 0, 1);

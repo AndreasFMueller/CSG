@@ -71,6 +71,7 @@ public:
 	friend vector	operator*(double l, const vector& v);
 	friend vector	operator*(const vector& v, double l);
 	vector	orthogonalto(const vector& v) const;
+	bool	parallel(const vector& v) const;
 };
 
 vector	operator*(double l, const vector& v);
@@ -92,13 +93,14 @@ class point {
 	double	_x, _y, _z;
 public:
 	point(double x, double y, double z) : _x(x), _y(y), _z(z) { }
+	point() : _x(0), _y(0), _z(0) { }
 	const double&	x() const { return _x; }
 	const double&	y() const { return _y; }
 	const double&	z() const { return _z; }
-	point	operator+(const vector& other) {
+	point	operator+(const vector& other) const {
 		return point(_x + other.x(), _y + other.y(), _z + other.z());
 	}
-	point	operator-(const vector& other) {
+	point	operator-(const vector& other) const {
 		return point(_x - other.x(), _y - other.y(), _z - other.z());
 	}
 };
