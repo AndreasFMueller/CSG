@@ -1,5 +1,5 @@
 /*
- * example6.cpp -- example 6, Box
+ * example6.cpp -- example 7, Sphere cut by a plane
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
@@ -9,10 +9,13 @@
 #include <iostream>
 #include <common.h>
 #include <Box.h>
+#include <SphericalSphere.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 
 namespace csg {
+
+typedef Nef_polyhedron::Plane_3	Plane_3;
 
 /** 
  * \brief main function for example6
@@ -33,19 +36,37 @@ int	main(int argc, char *argv[]) {
 	// build a polygon 
 	Polyhedron	p1;
 
-	// create the box
-	point	from(-1, -2, -1.5);
-	point	to(1, 2, 1.5);
-	Build_Box	b1(from, to);
+	// create a sphere
+	double	radius = 4;
+	int	steps = 30;
+	Build_SphericalSphere	b1(radius, steps);
 	p1.delegate(b1);
-	fprintf(stderr, "Box created\n");
 
 	// convert to Nef polyhedra
 	Nef_polyhedron	n1(p1);
 
+	// create a half space
+	if (debug) {
+		fprintf(stderr, "%s:%d: construct a plane\n",
+			__FILE__, __LINE__);
+	}
+	Plane_3	plane(1,2,3,-1);
+
+	if (debug) {
+		fprintf(stderr, "%s:%d: construct a half space\n",
+			__FILE__, __LINE__);
+	}
+	Nef_polyhedron	n2(plane, Nef_polyhedron::INCLUDED);
+
+	if (debug) {
+		fprintf(stderr, "%s:%d: intersect with half space\n",
+			__FILE__, __LINE__);
+	}
+	Nef_polyhedron	n3 = n1 * n2; // intersection
+
 	// output difference
 	Polyhedron	P;
-	n1.convert_to_polyhedron(P);
+	n3.convert_to_polyhedron(P);
 	std::cout << P;
 
 	return EXIT_SUCCESS;

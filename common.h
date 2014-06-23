@@ -7,7 +7,7 @@
 #define _common_h
 
 #include <CGAL/Gmpq.h>
-#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Extended_cartesian.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
@@ -17,7 +17,7 @@ extern int	debug;
 
 namespace csg {
 
-typedef CGAL::Simple_cartesian<CGAL::Gmpq>	Kernel;
+typedef CGAL::Extended_cartesian<CGAL::Gmpq>	Kernel;
 typedef CGAL::Polyhedron_3<Kernel>		Polyhedron;
 typedef typename Polyhedron::HalfedgeDS::Vertex Vertex;
 typedef typename Vertex::Point  		Point;

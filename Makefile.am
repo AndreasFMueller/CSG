@@ -29,7 +29,8 @@ include_HEADERS = common.h						\
 	Line.h								\
 	Box.h
 
-noinst_PROGRAMS = example1 example2 example3 example4 example5 example6
+noinst_PROGRAMS = example1 example2 example3 example4 example5 example6 \
+	example7
 
 example1_SOURCES = example1.cpp
 example1_LDADD = libcsg.la
@@ -49,6 +50,9 @@ example5_LDADD = libcsg.la
 example6_SOURCES = example6.cpp
 example6_LDADD = libcsg.la
 
+example7_SOURCES = example7.cpp
+example7_LDADD = libcsg.la
+
 test:	example1
 	time ./example1 -d -r 10 -n 2 > example1.off
 
@@ -66,3 +70,6 @@ test5:	example5
 
 test6:	example6
 	time ./example6 -d > example6.off
+
+test7:	example7
+	time ./example7 -d > example7.off
