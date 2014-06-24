@@ -4,6 +4,7 @@
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
 #include <Curve.h>
+#include <debug.h>
 
 namespace csg {
 
@@ -41,16 +42,14 @@ void	Build_Curve::operator()(Polyhedron::HalfedgeDS& hds) {
 	double	deltaphi = 2 * M_PI / _phisteps;
 	for (int t = 0; t <= _steps; t++) {
 		double	_t = _interval.min() + t * deltat;
-		if (debug) {
-			fprintf(stderr, "%s:%d: circle at t = %f\n", 
-				__FILE__, __LINE__, _t);
+		if (debuglevel > LOG_DEBUG) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "circle at t = %f", _t);
 		}
 		point	w = _f.position(_t);
 		frame	fr = _f.frenetframe(_t);
-		if (debug) {
-			fprintf(stderr,
-				"%s:%d: tangent (%f, %f, %f), "
-				"normal (%f, %f, %f)\n", __FILE__, __LINE__,
+		if (debuglevel > LOG_DEBUG) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0,
+				"tangent (%f, %f, %f), normal (%f, %f, %f)",
 				fr.v1().x(), fr.v1().y(), fr.v1().z(),
 				fr.v2().x(), fr.v2().y(), fr.v2().z());
 		}
@@ -66,6 +65,7 @@ void	Build_Curve::operator()(Polyhedron::HalfedgeDS& hds) {
 	// add all facets
 	
 	// start cap
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "start cap");
 	for (int phi = 0; phi < _phisteps - 1; phi++) {
 		add_facet(B, 0, vertex(0, phi), vertex(0, phi + 1));
 	}
@@ -73,9 +73,8 @@ void	Build_Curve::operator()(Polyhedron::HalfedgeDS& hds) {
 
 	// intermediate zones
 	for (int t = 0; t < _steps; t++) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: facets for t = %d\n",
-				__FILE__, __LINE__, t);
+		if (debuglevel > LOG_DEBUG) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "facets for t = %d", t);
 		}
 		for (int phi = 0; phi < _phisteps - 1; phi++) {
 			add_facet(B,
@@ -98,9 +97,7 @@ void	Build_Curve::operator()(Polyhedron::HalfedgeDS& hds) {
 	}
 
 	// end cap
-	if (debug) {
-		fprintf(stderr, "%s:%d: end cap\n", __FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "end cap");
 	for (int phi = 0; phi < _phisteps - 1; phi++) {
 		add_facet(B,
 			vertex(_steps, phi),

@@ -8,6 +8,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <common.h>
+#include <debug.h>
 #include <Line.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
@@ -24,7 +25,7 @@ int	main(int argc, char *argv[]) {
 	while (EOF != (c = getopt(argc, argv, "r:ds:")))
 		switch (c) {
 		case 'd':
-			debug++;
+			debuglevel = LOG_DEBUG;
 			break;
 		case 'r':
 			radius = atof(optarg);
@@ -34,15 +35,12 @@ int	main(int argc, char *argv[]) {
 			break;
 		}
 
-	if (debug) {
-		fprintf(stderr, "%s:%d: 3 lines of radius %f\n",
-			__FILE__, __LINE__, radius);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "3 lines of radius %f", radius);
 
 	// build a polygon 
 	Polyhedron	p1, p2, p3;
 
-	// create a curve
+	// create three orthogonal lines 
 	Interval	interval(-1, 2);
 	Line	l1(point(), point(1,0,0));
 	Line	l2(point(), point(0,1,0));
@@ -62,7 +60,7 @@ int	main(int argc, char *argv[]) {
 	Nef_polyhedron	n3(p3);
 	n1 = n1 + n3;
 
-	// output difference
+	// output union
 	Polyhedron	P;
 	n1.convert_to_polyhedron(P);
 	std::cout << P;

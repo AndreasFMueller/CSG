@@ -8,6 +8,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <common.h>
+#include <debug.h>
 #include <Box.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
@@ -22,13 +23,11 @@ int	main(int argc, char *argv[]) {
 	while (EOF != (c = getopt(argc, argv, "d")))
 		switch (c) {
 		case 'd':
-			debug++;
+			debuglevel = LOG_DEBUG;
 			break;
 		}
 
-	if (debug) {
-		fprintf(stderr, "%s:%d: box\n", __FILE__, __LINE__ );
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "box\n");
 
 	// build a polygon 
 	Polyhedron	p1;
@@ -43,7 +42,7 @@ int	main(int argc, char *argv[]) {
 	// convert to Nef polyhedra
 	Nef_polyhedron	n1(p1);
 
-	// output difference
+	// output 
 	Polyhedron	P;
 	n1.convert_to_polyhedron(P);
 	std::cout << P;

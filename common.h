@@ -13,8 +13,6 @@
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <math.h>
 
-extern int	debug;
-
 namespace csg {
 
 typedef CGAL::Extended_cartesian<CGAL::Gmpq>	Kernel;
@@ -22,6 +20,7 @@ typedef CGAL::Polyhedron_3<Kernel>		Polyhedron;
 typedef typename Polyhedron::HalfedgeDS::Vertex Vertex;
 typedef typename Vertex::Point  		Point;
 typedef CGAL::Nef_polyhedron_3<Kernel>		Nef_polyhedron;
+typedef	Nef_polyhedron::Plane_3			Plane;
 typedef Kernel::Aff_transformation_3		Aff_transformation;
 typedef CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	Builder;
 

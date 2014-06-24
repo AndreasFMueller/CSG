@@ -11,6 +11,7 @@
 #include <Curve.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+#include <debug.h>
 
 namespace csg {
 
@@ -45,7 +46,7 @@ int	main(int argc, char *argv[]) {
 	while (EOF != (c = getopt(argc, argv, "r:dn:s:")))
 		switch (c) {
 		case 'd':
-			debug++;
+			debuglevel = LOG_DEBUG;
 			break;
 		case 'r':
 			radius = atof(optarg);
@@ -58,10 +59,7 @@ int	main(int argc, char *argv[]) {
 			break;
 		}
 
-	if (debug) {
-		fprintf(stderr, "%s:%d: arrow of radius %f\n",
-			__FILE__, __LINE__, radius);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "arrow of radius %f", radius);
 
 	// build a polygon 
 	Polyhedron	p1;

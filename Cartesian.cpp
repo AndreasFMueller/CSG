@@ -4,6 +4,7 @@
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
 #include <Cartesian.h>
+#include <debug.h>
 
 namespace csg {
 
@@ -25,10 +26,7 @@ void	Build_Cartesian::operator()(Polyhedron::HalfedgeDS& hds) {
 		}
 	}
 	for (int x = 0; x < _xsteps; x++) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: x = %d\n",
-				__FILE__, __LINE__, x);
-		}
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "x = %d", x);
 		for (int y = 0; y < _ysteps; y++) {
 			add_facet(B, 
 				vertex(x,     y    )    ,

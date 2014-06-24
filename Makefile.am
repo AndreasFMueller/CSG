@@ -5,7 +5,7 @@
 #
 lib_LTLIBRARIES = libcsg.la
 
-libcsg_la_SOURCES = common.cpp						\
+libcsg_la_SOURCES = common.cpp timekeeper.cpp debug.cpp			\
 	Surface.cpp							\
 	Cartesian.cpp							\
 	Polar.cpp							\
@@ -17,7 +17,7 @@ libcsg_la_SOURCES = common.cpp						\
 	Line.cpp							\
 	Box.cpp
 
-include_HEADERS = common.h						\
+include_HEADERS = common.h timekeeper.h	debug.h				\
 	Surface.h							\
 	Cartesian.h							\
 	Polar.h								\

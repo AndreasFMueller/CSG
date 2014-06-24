@@ -8,14 +8,13 @@
 #include <getopt.h>
 #include <iostream>
 #include <common.h>
+#include <debug.h>
 #include <Box.h>
 #include <SphericalSphere.h>
 #include <CGAL/IO/Polyhedron_iostream.h>
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 
 namespace csg {
-
-typedef Nef_polyhedron::Plane_3	Plane_3;
 
 /** 
  * \brief main function for example6
@@ -25,13 +24,11 @@ int	main(int argc, char *argv[]) {
 	while (EOF != (c = getopt(argc, argv, "d")))
 		switch (c) {
 		case 'd':
-			debug++;
+			debuglevel = LOG_DEBUG;
 			break;
 		}
 
-	if (debug) {
-		fprintf(stderr, "%s:%d: box\n", __FILE__, __LINE__ );
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "sphere cut by plane");
 
 	// build a polygon 
 	Polyhedron	p1;
@@ -46,22 +43,13 @@ int	main(int argc, char *argv[]) {
 	Nef_polyhedron	n1(p1);
 
 	// create a half space
-	if (debug) {
-		fprintf(stderr, "%s:%d: construct a plane\n",
-			__FILE__, __LINE__);
-	}
-	Plane_3	plane(1,2,3,-1);
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "construct a plane");
+	Plane	plane(1,2,3,-1);
 
-	if (debug) {
-		fprintf(stderr, "%s:%d: construct a half space\n",
-			__FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "construct a half space");
 	Nef_polyhedron	n2(plane, Nef_polyhedron::INCLUDED);
 
-	if (debug) {
-		fprintf(stderr, "%s:%d: intersect with half space\n",
-			__FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "intersect with half space");
 	Nef_polyhedron	n3 = n1 * n2; // intersection
 
 	// output difference

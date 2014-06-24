@@ -1,3 +1,11 @@
+20140624:
+	* convert to Extended_cartesian, to enable half space constructions
+	* add example7, illustrating half space cut
+	* add half space cut in example5
+	* use Nef_nary_union_3 in example5
+	* add debug, convert from printf to debug
+	* add timekeeper
+
 20140526:
 	* add straight line implementation
 	* add example5

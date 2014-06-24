@@ -17,6 +17,7 @@
 #include <SphericalSurface.h>
 #include <Cartesian.h>
 #include <Polar.h>
+#include <debug.h>
 
 namespace csg {
 
@@ -65,7 +66,7 @@ int	main(int argc, char *argv[]) {
 	while (EOF != (c = getopt(argc, argv, "r:dn:")))
 		switch (c) {
 		case 'd':
-			debug++;
+			debuglevel++;
 			break;
 		case 'r':
 			radius = atof(optarg);
@@ -75,10 +76,7 @@ int	main(int argc, char *argv[]) {
 			break;
 		}
 
-	if (debug) {
-		fprintf(stderr, "%s:%d: sphere of radius %f\n",
-			__FILE__, __LINE__, radius);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "sphere of radius %f", radius);
 
 	// build a polygon 
 	Polyhedron	p1, p2, p3, p4;
@@ -86,7 +84,7 @@ int	main(int argc, char *argv[]) {
 	// create spherical surfaces
 	Build_SphericalSphere	b1(radius, steps);
 	p1.delegate(b1);
-	fprintf(stderr, "sphere created\n");
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "sphere created");
 
 	Sine	sine(radius);
 	Build_SphericalSurface	b2(sine, 4 * steps);
@@ -106,13 +104,12 @@ int	main(int argc, char *argv[]) {
 	p4.delegate(b4);
 
 	// compute translation
-	typedef	CGAL::Vector_3<Kernel>	Vector;
-	Vector	d(radius, 0, 0);
+	Kernel::Vector_3	d(radius, 0, 0);
 	Aff_transformation	translate(CGAL::Translation(), d);
 
 	// convert to Nef polyhedra
 	Nef_polyhedron	n1(p1);
-	fprintf(stderr, "Nef_polyhedron created\n");
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "Nef_polyhedron created");
 	Nef_polyhedron	n2(p2);
 	Nef_polyhedron	n3(p3);
 	Nef_polyhedron	n4(p4);

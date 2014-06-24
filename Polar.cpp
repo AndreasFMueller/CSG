@@ -7,6 +7,7 @@
 
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 #include <math.h>
+#include <debug.h>
 
 namespace csg {
 
@@ -42,21 +43,14 @@ int	Build_Polar::vertex(const int r, const int phi) const {
  * \brief add vertices (common to all surfaces)
  */
 void	Build_Polar::add_vertices(Builder& B) {
-	if (debug) {
-		fprintf(stderr, "%s:%d: vertices\n", __FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "vertices");
 	int	philimit = closed() ? _phisteps : (_phisteps + 1);
-	if (debug) {
-		fprintf(stderr, "%s:%d: philimit: %d (_phisteps = %d)\n",
-			__FILE__, __LINE__, philimit, _phisteps);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "philimit: %d (_phisteps = %d)",
+		philimit, _phisteps);
 	int	rinit = (contains0()) ? 1 : 0;
 	for (int r = rinit; r <= _rsteps; r++) {
 		double	_r = _domain.rrange().min() + r * deltar;
-		if (debug) {
-			fprintf(stderr, "%s:%d: r = %d, _r = %f\n",
-				__FILE__, __LINE__, r, _r);
-		}
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "r = %d, _r = %f", r, _r);
 		for (int phi = 0; phi < philimit; phi++) {
 			double	_phi = _domain.phirange().min() + phi * deltaphi;
 			add_vertex(B, p(_r, _phi, _h));
@@ -75,9 +69,7 @@ void	Build_Polar::add_vertices(Builder& B) {
  * This method does not add the triangles along the border of the domain
  */
 void	Build_Polar::add_surface_triangles(Builder& B) {
-	if (debug) {
-		fprintf(stderr, "%s:%d: surface facets\n", __FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "surface facets");
 	int	rlimit = _rsteps - ((contains0()) ? 1 : 0);
 	for (int r = 0; r < rlimit; r++) {
 		for (int phi = 0; phi < _phisteps; phi++) {
@@ -109,15 +101,10 @@ void	Build_Polar::add_surface_triangles(Builder& B) {
  */
 void	Build_Polar::add_surface_fan(Builder& B) {
 	if (!contains0()) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: fan not needed\n",
-				__FILE__, __LINE__);
-		}
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "fan not needed");
 		return;
 	}
-	if (debug) {
-		fprintf(stderr, "%s:%d: add fan\n", __FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "add fan");
 	for (int phi = 0; phi < _phisteps; phi++) {
 		add_facet(B,
 			vertexnumber() - 2,
@@ -135,16 +122,10 @@ void	Build_Polar::add_surface_fan(Builder& B) {
  */
 void	Build_Polar::add_radius_surface(Builder& B) {
 	if (closed()) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: radius surfaces not needed\n",
-				__FILE__, __LINE__);
-		}
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "radius surfaces not needed");
 		return;
 	}
-	if (debug) {
-		fprintf(stderr, "%s:%d: radius surfaces\n",
-			__FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "radius surfaces");
 	int	rlimit = _rsteps - ((contains0()) ? 1 : 0);
 	for (int r = 0; r < rlimit; r++) {
 		add_facet(B,
@@ -193,9 +174,7 @@ void	Build_Polar::add_radius_surface(Builder& B) {
  */
 void	Build_Polar::add_perimeter(Builder& B) {
 	int	rimindex = _rsteps - ((contains0()) ? 1 : 0);
-	if (debug) {
-		fprintf(stderr, "%s:%d: outer surface\n", __FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "outer surface");
 	for (int phi = 0; phi < _phisteps; phi++) {
 		add_facet(B,
 			vertex(rimindex, phi    )    ,
@@ -209,10 +188,7 @@ void	Build_Polar::add_perimeter(Builder& B) {
 	}
 
 	if (!contains0()) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: inner surface\n",
-				__FILE__, __LINE__);
-		}
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "inner surface");
 		for (int phi = 0; phi < _phisteps; phi++) {
 			add_facet(B,
 				vertex(0, phi    )    ,
@@ -232,20 +208,14 @@ void	Build_Polar::add_perimeter(Builder& B) {
  */
 void	Build_Polar::operator()(Polyhedron::HalfedgeDS& hds) {
 	Builder	B(hds, true);
-	if (debug) {
-		fprintf(stderr, "%s:%d: start building surface\n",
-			__FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "start building surface");
 	B.begin_surface(0, 0, 0);
 	add_vertices(B);
 	add_surface_triangles(B);
 	add_surface_fan(B);
 	add_radius_surface(B);
 	add_perimeter(B);
-	if (debug) {
-		fprintf(stderr, "%s:%d: all factes added\n",
-			__FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "all factes added");
 	B.end_surface();
 }
 

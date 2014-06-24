@@ -20,7 +20,7 @@ AC_PROG_LIBTOOL
 
 # Checks for header files
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h stdio.h unistd.h math.h errno.h string.h])
+AC_CHECK_HEADERS([stdlib.h stdio.h unistd.h math.h errno.h string.h syslog.h sys/time.h])
 
 # Check for libraries
 AC_CHECK_LIB([gmp], [__gmpz_init])

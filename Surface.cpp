@@ -4,13 +4,14 @@
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
 #include <Surface.h>
+#include <debug.h>
 
 namespace csg {
 
 void	Build_Surface::add_vertex(Builder& B, double x, double y, double z) {
-	if (debug) {
-		fprintf(stderr, "%s:%d: vertex %d (%f, %f, %f)\n",
-			__FILE__, __LINE__, vertexnumber(), x, y, z);
+	if (debuglevel > LOG_DEBUG) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "vertex %d (%f, %f, %f)",
+			vertexnumber(), x, y, z);
 	}
 	B.add_vertex(Point(x, y, z));
 	_vertexnumber++;
@@ -21,9 +22,9 @@ void	Build_Surface::add_vertex(Builder& B, const point& p) {
 }
 
 void	Build_Surface::add_facet(Builder& B, int a, int b, int c) {
-	if (debug) {
-		fprintf(stderr, "%s:%d: facet  %d (%d, %d, %d)\n",
-			__FILE__, __LINE__, facetnumber(), a, b, c);
+	if (debuglevel > LOG_DEBUG) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "facet  %d (%d, %d, %d)",
+			facetnumber(), a, b, c);
 	}
 	if (a >= vertexnumber()) {
 		fprintf(stderr, "vertex number %d exceeds %d\n", a,

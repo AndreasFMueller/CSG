@@ -4,7 +4,8 @@
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
 #include <SphericalSurface.h>
-
+#include <common.h>
+#include <debug.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
 
 namespace csg {
@@ -37,20 +38,14 @@ void	Build_SphericalSurface::operator()(Polyhedron::HalfedgeDS& hds) {
 	add_vertex(B, 0, 0, -_f(M_PI, 0));
 
 	// triangles around the north pole
-	if (debug) {
-		fprintf(stderr, "%s:%d: triangles around north pole\n",
-			__FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "triangles around north pole");
 	for (int i = 1; i <= 4 * _steps - 1; i++) {
 		add_facet(B, 0, i, i + 1);
 	}
 	add_facet(B, 0, 4 * _steps, 1);
 
 	// triangles around the south pole
-	if (debug) {
-		fprintf(stderr, "%s:%d: triangles around south pole\n",
-			__FILE__, __LINE__);
-	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "triangles around south pole");
 	for (int i = 1; i <= 4 * _steps - 1; i++) {
 		add_facet(B,
 			vertexnumber() - 1,
@@ -64,10 +59,7 @@ void	Build_SphericalSurface::operator()(Polyhedron::HalfedgeDS& hds) {
 
 	// triangles in strips
 	for (int theta = 1; theta < 2 * _steps - 1; theta++) {
-		if (debug) {
-			fprintf(stderr, "%s:%d: zone theta = %d\n",
-				__FILE__, __LINE__, theta);
-		}
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "zone theta = %d", theta);
 		int	t = 4 * (theta - 1) * _steps + 1;
 		for (int phi = 0; phi < 4 * _steps - 1; phi++) {
 			add_facet(B, 
