@@ -66,7 +66,7 @@ test4:	example4
 	time ./example4 -d -s 32 > example4.off
 
 test5:	example5
-	time ./example5 -d -s 32 > example5.off
+	time ./example5 -d -s 32 -c 50 > example5.off
 
 test6:	example6
 	time ./example6 -d > example6.off
