@@ -1,3 +1,8 @@
+20140626:
+	* add example8, solution surfaces of a partial differential equation,
+	  case where solution is not uniquely determined by the boundary
+	  conditions
+
 20140624:
 	* convert to Extended_cartesian, to enable half space constructions
 	* add example7, illustrating half space cut

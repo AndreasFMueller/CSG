@@ -30,7 +30,7 @@ include_HEADERS = common.h timekeeper.h	debug.h				\
 	Box.h
 
 noinst_PROGRAMS = example1 example2 example3 example4 example5 example6 \
-	example7
+	example7 example8
 
 example1_SOURCES = example1.cpp
 example1_LDADD = libcsg.la
@@ -53,6 +53,9 @@ example6_LDADD = libcsg.la
 example7_SOURCES = example7.cpp
 example7_LDADD = libcsg.la
 
+example8_SOURCES = example8.cpp
+example8_LDADD = libcsg.la
+
 test:	example1
 	time ./example1 -d -r 10 -n 2 > example1.off
 
@@ -73,3 +76,7 @@ test6:	example6
 
 test7:	example7
 	time ./example7 -d > example7.off
+
+test8:	example8
+	time ./example8 -d -d > example8.off
+

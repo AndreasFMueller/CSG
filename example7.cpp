@@ -1,5 +1,5 @@
 /*
- * example6.cpp -- example 7, Sphere cut by a plane
+ * example7.cpp -- example 7, Sphere cut by a plane
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */

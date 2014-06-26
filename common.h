@@ -104,6 +104,13 @@ public:
 	}
 };
 
+/**
+ * \brief A vector valued function
+ *
+ * The method p represents the points of the surface, and v represents the
+ * normal vector. This is used to create a 3D-object representing the
+ * surface.
+ */
 class PointFunction {
 public:
 	virtual	point	p(double, double) const = 0;
