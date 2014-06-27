@@ -78,5 +78,5 @@ test7:	example7
 	time ./example7 -d > example7.off
 
 test8:	example8
-	time ./example8 -d -d > example8.off
+	time ./example8 -d > example8.off
 
