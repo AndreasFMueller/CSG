@@ -4,6 +4,7 @@
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
 #include <common.h>
+#include <stdexcept>
 
 namespace csg {
 
@@ -26,6 +27,10 @@ double	vector::norm() const {
 }
 
 vector	vector::normalized() const {
+	double	n = norm();
+	if (n == 0) {
+		throw std::runtime_error("cannot normalize 0 vector");
+	}
 	return (*this) / norm();
 }
 

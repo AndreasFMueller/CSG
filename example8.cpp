@@ -26,8 +26,9 @@ namespace csg {
 typedef CGAL::Nef_nary_union_3<Nef_polyhedron>  Nef_nary_union;
 
 const double	a = 0.25;
-const double	speed = 1;
+const double	speed = 1.5;
 int	steps = 30;
+const	double	charstep = 0.25;
 
 double	h0(double x) {
 	return exp(-log(2) * 0.5 * 0.5 / (x * x));
@@ -74,18 +75,32 @@ public:
 
 class AlternativeSolution : public PointFunction {
 	double	mu;
+	double	F(double x, double y) const {
+		if (fabs(x) <= fabs(y)) {
+			return 0;
+		}
+		return f(sqrt(x * x - y * y), mu);
+	}
 public:
 	AlternativeSolution(double _mu) : mu(_mu) { }
 	virtual point	p(double xi, double eta) const {
-		double	x = 2 * (eta * eta + xi * xi);
-		double	y = 2 * (eta * eta - xi * xi);
-		return point(x, y, f(sqrt(x * x - y * y), mu));
+		double	x = 4 * (eta * eta + xi * xi);
+		double	y = 4 * (eta * eta - xi * xi);
+		return point(x, y, F(x, y));
 	}
 	virtual vector	v(double xi, double eta) const {
-		return vector::e3;
+		double	x = 4 * (eta * eta + xi * xi);
+		double	y = 4 * (eta * eta - xi * xi);
+		//debug(LOG_DEBUG, DEBUG_LOG, 0, "x = %f, y = %f", x, y);
+		double	dy = 0.0001;
+		double	derivative = (F(x, y + dy) - F(x, y)) / dy;
+		//debug(LOG_DEBUG, DEBUG_LOG, 0, "derivative = %f\n", derivative);
+		vector	n =  vector(0., -derivative, 1.).normalized();
+		//debug(LOG_DEBUG, DEBUG_LOG, 0, "n = (%f, %f, %f)",
+		//	n.x(), n.y(), n.z());
+		return n;
 	}
 };
-
 
 class SupportSheet : public PointFunction {
 public:
@@ -186,11 +201,11 @@ static Nef_polyhedron	build_alternative() {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "build alternative solution surfaces");
 	Nef_nary_union	unioner;
 	CartesianDomain	xietadomain(Interval(0, 1), Interval(0, 1));
-	for (double m = 0.5; m > -0.5; m -= 0.2) {
+	for (double m = 0.5; m > -0.4; m -= 0.25) {
 		debug(LOG_DEBUG, DEBUG_LOG, 0, "m = %f", m);
 		AlternativeSolution	altsolution(m);
 		Build_CartesianPointFunction	a(altsolution,
-			xietadomain, steps, steps, sheetthickness);
+			xietadomain, 2 * steps, 2 * steps, sheetthickness);
 		Polyhedron	p;
 		p.delegate(a);
 		Nef_polyhedron	n(p);
@@ -201,8 +216,10 @@ static Nef_polyhedron	build_alternative() {
 }
 
 static void	add_characteristic(Nef_nary_union& unioner, double y0) {
-	Interval	interval(0, fabs(y0));
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "add characteristic at y0 = %f", y0);
+	double	tmax = y0 * acosh(2 / y0);
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "t interval extends to %f", tmax);
+	Interval	interval(0, 1.1 * tmax);
 	CharacteristicY	cs(y0);
 	Build_Curve	charcurve(cs, interval, steps, 8, smallcurveradius);
 	Polyhedron	p;
@@ -216,7 +233,8 @@ static void	add_asymptote(Nef_nary_union& unioner, double m) {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "adding asymptote %f", m);
 	Interval	interval(-0.1, 2.1);
 	Asymptote	asymptote(m);
-	Build_Curve	charcurve(asymptote, interval, steps, 8, smallcurveradius);
+	Build_Curve	charcurve(asymptote, interval, steps, 8,
+				1.5 * smallcurveradius);
 	Polyhedron	p;
 	p.delegate(charcurve);
 	Nef_polyhedron	n(p);
@@ -226,11 +244,12 @@ static void	add_asymptote(Nef_nary_union& unioner, double m) {
 
 static Nef_polyhedron	build_xcharacteristics() {
 	Nef_nary_union	unioner;
-	for (double x0 = 0.5; a * x0 * x0 < 2; x0 += 0.5) {
+	for (double x0 = charstep; a * x0 * x0 < 2; x0 += charstep) {
 		debug(LOG_DEBUG, DEBUG_LOG, 0, "characteristic for x0 = %f",
 			x0);
 		Polyhedron	p;
-		Interval	interval(-2, 2);
+		double	tmax = x0 * asinh(2 / x0);
+		Interval	interval(-1.1 * tmax, 1.1 * tmax);
 		CharacteristicX	cx(x0, -a * x0 * x0);
 		Build_Curve	charcurve(cx, interval, steps, 8,
 					smallcurveradius);
@@ -245,14 +264,15 @@ static Nef_polyhedron	build_xcharacteristics() {
 static Nef_polyhedron	build_characteristics() {
 	Nef_nary_union	unioner;
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "add 1st quadrant characteristics");
-	for (double y0 = 2; y0 > 0.1; y0 -= 0.5) {
+	for (double y0 = charstep * floor(2 / charstep); y0 > 0.1;
+			y0 -= charstep) {
 		add_characteristic(unioner, y0);
 	}
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "add asymptotes");
 	add_asymptote(unioner, 1);
 	add_asymptote(unioner, -1);
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "add 4th quadrant characteristics");
-	for (double y0 = -0.5; y0 > -2.1; y0 -= 0.5) {
+	for (double y0 = -charstep; y0 > -2.1; y0 -= charstep) {
 		add_characteristic(unioner, y0);
 	}
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "extract union of characteristics");
@@ -293,7 +313,7 @@ static Nef_polyhedron	build_support() {
 	CartesianDomain	domain(Interval(0, 4), Interval(0, 2));
 	SupportSheet	support;
 	Build_CartesianPointFunction	s(support,
-			domain, steps, steps, sheetthickness);
+			domain, steps, steps, 0.7 * sheetthickness);
 	Polyhedron	p;
 	p.delegate(s);
 	return	Nef_polyhedron(p);
@@ -363,58 +383,89 @@ int	main(int argc, char *argv[]) {
 			break;
 		}
 
-	debug(LOG_DEBUG, DEBUG_LOG, 0, "sphere cut by plane");
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "nonuniqueness of solution of a "
+		"partial differential equation");
 
 	// start building up the union of things to be restricted to a box
 	Nef_nary_union	unioner;
 
 	// create a the solution surface
-	if (show_solution) {
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding solution surface");
-		Polyhedron	p;
-		CartesianDomain	domain(Interval(0, 4), Interval(-2, 2));
-		BaseSolution	basesolution;
-		Build_CartesianFunction	b(basesolution,
-					domain, 2 * steps, 2 * steps, sheetthickness);
-		p.delegate(b);
-		Nef_polyhedron	n(p);
-		unioner.add_polyhedron(n);
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "solution surface added");
+	try {
+		if (show_solution) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding solution surface");
+			Polyhedron	p;
+			CartesianDomain	domain(Interval(0, 4), Interval(-2, 2));
+			BaseSolution	basesolution;
+			Build_CartesianFunction	b(basesolution, domain,
+				2 * steps, 2 * steps, sheetthickness);
+			p.delegate(b);
+			Nef_polyhedron	n(p);
+			unioner.add_polyhedron(n);
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "solution surface added");
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add solution: %s",
+			x.what());
 	}
 
 	// create an alternative solution surface
-	if (show_alternatives) {
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding alternatives");
-		unioner.add_polyhedron(build_alternative());
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "alternatives added");
+	try {
+		if (show_alternatives) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding alternatives");
+			unioner.add_polyhedron(build_alternative());
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "alternatives added");
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add alternatives: %s",
+			x.what());
 	}
 
 	// add additional characteristics
-	if (show_characteristics) {
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding characteristics");
-		unioner.add_polyhedron(build_characteristics());
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "characteristics added");
+	try {
+		if (show_characteristics) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding characteristics");
+			unioner.add_polyhedron(build_characteristics());
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "characteristics added");
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add characteristics: %s",
+			x.what());
 	}
 
 	// add negative characteristics
-	if (show_negative) {
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding neg characteristics");
-		unioner.add_polyhedron(build_xcharacteristics());
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "neg characteristics added");
+	try {
+		if (show_negative) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding neg characteristics");
+			unioner.add_polyhedron(build_xcharacteristics());
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "neg characteristics added");
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add negative characteristics: %s",
+			x.what());
 	}
 
 	// add the FCurve
-	if (show_fcurve) {
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding fcurve");
-		unioner.add_polyhedron(build_fcurve());
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "fcurve added");
+	try {
+		if (show_fcurve) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding fcurve");
+			unioner.add_polyhedron(build_fcurve());
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "fcurve added");
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add fcurve: %s",
+			x.what());
 	}
 
 	// add the support sheet
-	if (show_support) {
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding support");
-		unioner.add_polyhedron(build_support());
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "support added");
+	try {
+		if (show_support) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding support");
+			unioner.add_polyhedron(build_support());
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "support added");
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add support: %s",
+			x.what());
 	}
 
 	// extract union
