@@ -104,4 +104,5 @@ extern "C" void vdebug(int loglevel, const char *file, int line,
 
 	// format log message
 	fprintf(stderr, "%s %s\n", prefix, msgbuffer);
+	fflush(stderr);
 }

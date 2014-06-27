@@ -17,7 +17,9 @@
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 #include <math.h>
 #include <Curve.h>
+#include <Arrow.h>
 #include <CGAL/Nef_nary_union_3.h>
+#include <fstream>
 
 namespace csg {
 
@@ -84,6 +86,17 @@ public:
 	}
 };
 
+
+class SupportSheet : public PointFunction {
+public:
+	virtual point	p(double x, double z) const {
+		return point(x, 0, -z - a * x * x);
+	}
+	virtual vector	v(double x, double z) const {
+		return vector::e2;
+	}
+};
+
 class CharacteristicY : public CurveFunction {
 	double	y0;
 public:
@@ -91,20 +104,14 @@ public:
 		: CurveFunction(deltat), y0(_y0) { }
 	virtual point	position(double t) const {
 		point	p(y0 * sinh(t / y0), y0 * cosh(t / y0), a * y0 * y0);
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "t = %f, pos = (%f, %f, %f)",
-			t, p.x(), p.y(), p.z());
 		return p;
 	}
 	virtual vector	tangent(double t) const {
 		vector	v(cosh(t / y0), sinh(t / y0), 0);
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "t = %f, tangent = (%f, %f, %f)",
-			t, v.x(), v.y(), v.z());
 		return v;
 	}
 	virtual vector	normal(double t) const {
 		vector	n(sinh(t / y0) / y0, cosh(t / y0) / y0, 0);
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "t = %f, normal = (%f, %f, %f)",
-			t, n.x(), n.y(), n.z());
 		return n;
 	}
 };
@@ -129,15 +136,61 @@ public:
 	}
 };
 
+class Asymptote : public CurveFunction {
+	double	m;
+public:
+	Asymptote(const double _m, double deltat = 0)
+		: CurveFunction(deltat), m(_m) { }
+	virtual point	position(double t) const {
+		return point(t, m * t, 0.);
+	}
+	virtual vector	tangent(double t) const {
+		return vector(1., m, 0.);
+	}
+	virtual vector	normal(double t) const {
+		return vector::e2;
+	}
+};
+
+class InitialCurve : public CurveFunction {
+public:
+	virtual point	position(double t) const {
+		return point(0., t, a * t * t);
+	}
+	virtual vector	tangent(double t) const {
+		return vector(0., 1., 2 * a * t);
+	}
+	virtual vector	normal(double t) const {
+		return vector(0., 0., 2 * a);
+	}
+};
+
+class FCurve : public CurveFunction {
+public:
+	virtual point	position(double t) const {
+		return point(t, 0., -a * t * t);
+	}
+	virtual vector	tangent(double t) const {
+		return vector(1., 0., -2 * a * t);
+	}
+	virtual vector	normal(double t) const {
+		return vector(0., 0., -2 * a);
+	}
+};
+
+double	sheetthickness = 0.05;
+double	smallcurveradius = 0.015;
+double	largecurveradius = 0.040;
+
 static Nef_polyhedron	build_alternative() {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "build alternative solution surfaces");
 	Nef_nary_union	unioner;
 	CartesianDomain	xietadomain(Interval(0, 1), Interval(0, 1));
 	for (double m = 0.5; m > -0.5; m -= 0.2) {
 		debug(LOG_DEBUG, DEBUG_LOG, 0, "m = %f", m);
-		AlternativeSolution	altsolution(0.5);
+		AlternativeSolution	altsolution(m);
 		Build_CartesianPointFunction	a(altsolution,
-			xietadomain, steps, steps, 0.02);
+			xietadomain, steps, steps, sheetthickness);
 		Polyhedron	p;
 		p.delegate(a);
 		Nef_polyhedron	n(p);
@@ -148,10 +201,10 @@ static Nef_polyhedron	build_alternative() {
 }
 
 static void	add_characteristic(Nef_nary_union& unioner, double y0) {
-	Interval	interval(0, 2);
+	Interval	interval(0, fabs(y0));
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "add characteristic at y0 = %f", y0);
 	CharacteristicY	cs(y0);
-	Build_Curve	charcurve(cs, interval, steps, 8, 0.03);
+	Build_Curve	charcurve(cs, interval, steps, 8, smallcurveradius);
 	Polyhedron	p;
 	p.delegate(charcurve);
 	Nef_polyhedron	n(p);
@@ -159,22 +212,120 @@ static void	add_characteristic(Nef_nary_union& unioner, double y0) {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "curve added");
 }
 
-static Nef_polyhedron	build_characteristics() {
+static void	add_asymptote(Nef_nary_union& unioner, double m) {
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "adding asymptote %f", m);
+	Interval	interval(-0.1, 2.1);
+	Asymptote	asymptote(m);
+	Build_Curve	charcurve(asymptote, interval, steps, 8, smallcurveradius);
+	Polyhedron	p;
+	p.delegate(charcurve);
+	Nef_polyhedron	n(p);
+	unioner.add_polyhedron(n);
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "asymptote %f added", m);
+}
+
+static Nef_polyhedron	build_xcharacteristics() {
 	Nef_nary_union	unioner;
-	Interval	interval(0, 2);
-	for (double y0 = 0.5; y0 <= 2.01; y0 += 0.4) {
-		add_characteristic(unioner, y0);
-		add_characteristic(unioner, -y0);
+	for (double x0 = 0.5; a * x0 * x0 < 2; x0 += 0.5) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "characteristic for x0 = %f",
+			x0);
+		Polyhedron	p;
+		Interval	interval(-2, 2);
+		CharacteristicX	cx(x0, -a * x0 * x0);
+		Build_Curve	charcurve(cx, interval, steps, 8,
+					smallcurveradius);
+		p.delegate(charcurve);
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "add characteristic for x0 = %f",
+			x0);
+		unioner.add_polyhedron(p);
 	}
 	return unioner.get_union();
 }
+
+static Nef_polyhedron	build_characteristics() {
+	Nef_nary_union	unioner;
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "add 1st quadrant characteristics");
+	for (double y0 = 2; y0 > 0.1; y0 -= 0.5) {
+		add_characteristic(unioner, y0);
+	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "add asymptotes");
+	add_asymptote(unioner, 1);
+	add_asymptote(unioner, -1);
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "add 4th quadrant characteristics");
+	for (double y0 = -0.5; y0 > -2.1; y0 -= 0.5) {
+		add_characteristic(unioner, y0);
+	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "extract union of characteristics");
+	return unioner.get_union();
+}
+
+static Nef_polyhedron	build_axes() {
+	Nef_nary_union	unioner;
+	{
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "add X-axis");
+		Polyhedron	p;
+		Build_Arrow	b(point(-0.1, 0, 0),
+					point(4.1, 0, 0), smallcurveradius, 16);
+		p.delegate(b);
+		unioner.add_polyhedron(p);
+	}
+	{
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "add X-axis");
+		Polyhedron	p;
+		Build_Arrow	b(point(0, -2.1, 0),
+					point(0, 2.1, 0), smallcurveradius, 16);
+		p.delegate(b);
+		unioner.add_polyhedron(p);
+	}
+	{
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "add X-axis");
+		Polyhedron	p;
+		Build_Arrow	b(point(0, 0, -2.1),
+					point(0, 0, 2.1), smallcurveradius, 16);
+		p.delegate(b);
+		unioner.add_polyhedron(p);
+	}
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "extract axes union");
+	return unioner.get_union();
+}
+
+static Nef_polyhedron	build_support() {
+	CartesianDomain	domain(Interval(0, 4), Interval(0, 2));
+	SupportSheet	support;
+	Build_CartesianPointFunction	s(support,
+			domain, steps, steps, sheetthickness);
+	Polyhedron	p;
+	p.delegate(s);
+	return	Nef_polyhedron(p);
+}
+
+static Nef_polyhedron	build_fcurve() {
+	Polyhedron	p;
+	Interval	interval(0, 3);
+	FCurve	fc;
+	Build_Curve	fcurve(fc, interval,
+				steps, 8, largecurveradius);
+	p.delegate(fcurve);
+	return Nef_polyhedron(p);
+}
+
+bool	show_solution = true;
+bool	show_characteristics = true;
+bool	show_alternatives = true;
+bool	show_initial = true;
+bool	show_axes = true;
+bool	show_negative = true;
+bool	show_support = false;
+bool	show_fcurve = true;
 
 /** 
  * \brief main function for example6
  */
 int	main(int argc, char *argv[]) {
+	std::string	prefix("hypchar");
+
 	int	c;
-	while (EOF != (c = getopt(argc, argv, "d")))
+	while (EOF != (c = getopt(argc, argv, "dSACIXNPF")))
 		switch (c) {
 		case 'd':
 			if (debuglevel == LOG_DEBUG) {
@@ -183,34 +334,163 @@ int	main(int argc, char *argv[]) {
 				debuglevel = LOG_DEBUG;
 			}
 			break;
+		case 'S':
+			show_solution = !show_solution;
+			break;
+		case 'A':
+			show_alternatives = !show_alternatives;
+			break;
+		case 'C':
+			show_characteristics = !show_characteristics;
+			break;
+		case 'I':
+			show_initial = !show_initial;
+			break;
+		case 'X':
+			show_axes = !show_axes;
+			break;
+		case 'N':
+			show_negative = !show_negative;
+			break;
+		case 'F':
+			show_fcurve = !show_fcurve;
+			break;
+		case 'P':
+			show_support = !show_support;
+			break;
+		case 'p':
+			prefix = std::string(optarg);
+			break;
 		}
 
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "sphere cut by plane");
 
-	// build a polygon 
-	Polyhedron	p1;
+	// start building up the union of things to be restricted to a box
+	Nef_nary_union	unioner;
 
 	// create a the solution surface
-	CartesianDomain	domain(Interval(0, 2), Interval(-2, 2));
-	BaseSolution	basesolution;
-	Build_CartesianFunction	b1(basesolution,
-					domain, steps, 2 * steps, 0.02);
-	p1.delegate(b1);
-	Nef_polyhedron	n1(p1);
+	if (show_solution) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding solution surface");
+		Polyhedron	p;
+		CartesianDomain	domain(Interval(0, 4), Interval(-2, 2));
+		BaseSolution	basesolution;
+		Build_CartesianFunction	b(basesolution,
+					domain, 2 * steps, 2 * steps, sheetthickness);
+		p.delegate(b);
+		Nef_polyhedron	n(p);
+		unioner.add_polyhedron(n);
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "solution surface added");
+	}
 
 	// create an alternative solution surface
-	Nef_polyhedron	n2 = build_alternative();
+	if (show_alternatives) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding alternatives");
+		unioner.add_polyhedron(build_alternative());
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "alternatives added");
+	}
 
 	// add additional characteristics
-	Nef_polyhedron	n3 = build_characteristics();
+	if (show_characteristics) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding characteristics");
+		unioner.add_polyhedron(build_characteristics());
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "characteristics added");
+	}
+
+	// add negative characteristics
+	if (show_negative) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding neg characteristics");
+		unioner.add_polyhedron(build_xcharacteristics());
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "neg characteristics added");
+	}
+
+	// add the FCurve
+	if (show_fcurve) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding fcurve");
+		unioner.add_polyhedron(build_fcurve());
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "fcurve added");
+	}
+
+	// add the support sheet
+	if (show_support) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding support");
+		unioner.add_polyhedron(build_support());
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "support added");
+	}
+
+	// extract union
+	Nef_polyhedron	image = unioner.get_union();
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "base image constructed");
+
+	// restrict everything to a box
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "restrict to a box");
+	Build_Box	box(point(0, -2, -2), point(4, 2, 2));
+        Polyhedron      boxp;
+        boxp.delegate(box);
+	image = image * boxp;
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "restriction complete");
+
+	// add the initial curve
+	if (show_initial) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding initial curve");
+		Polyhedron	p;
+		Interval	interval(-2, 2);
+		InitialCurve	ic;
+		Build_Curve	initialcurve(ic, interval,
+					steps, 8, largecurveradius);
+		p.delegate(initialcurve);
+		image = image + Nef_polyhedron(p);
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "initial curve added");
+	}
+
+	// add axes
+	if (show_axes) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "adding axes");
+		image = image + build_axes();
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "axes added");
+	}
 
 	// output 
 	Polyhedron	P;
-	debug(LOG_DEBUG, DEBUG_LOG, 0, "build union");
-	Nef_polyhedron	sum = n1 + n2 + n3;
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "convert to polyhedron for output");
-	sum.convert_to_polyhedron(P);
+	image.convert_to_polyhedron(P);
 	std::cout << P;
+
+	// now we have to cut along the y-z-plane, because otherwise it would
+	// hardly be printable
+	Nef_polyhedron	left(Plane(1, 0, 0, 0), Nef_polyhedron::INCLUDED);
+	Nef_polyhedron	right(Plane(-1, 0, 0, 0), Nef_polyhedron::INCLUDED);
+
+	// cut off left side of object, and save in <prefix>-left.off
+	try {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "writing left part");
+		std::string	leftname = prefix + std::string("-left.off");
+		std::ofstream	leftout(leftname.c_str());
+		(left * image).convert_to_polyhedron(P);
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "conversion to polygon complete");
+		leftout << P;
+		leftout.close();
+	} catch (std::exception& x) {
+		fprintf(stderr, "error while writing left part: %s\n",
+			x.what());
+	} catch (...) {
+		fprintf(stderr, "error while writing left part\n");
+	}
+
+	// cut off right side of object, and save in <prefix>-right.off
+	try {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "writing right part");
+		std::string	rightname = prefix + std::string("-right.off");
+		std::ofstream	rightout(rightname.c_str());
+		(right * image).convert_to_polyhedron(P);
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "conversion to polygon complete");
+		rightout << P;
+		rightout.close();
+	} catch (std::exception& x) {
+		fprintf(stderr, "error while writing right part: %s\n",
+			x.what());
+	} catch (...) {
+		fprintf(stderr, "error while writing right part\n");
+	}
 
 	return EXIT_SUCCESS;
 }
