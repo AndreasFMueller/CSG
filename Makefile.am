@@ -3,58 +3,35 @@
 #
 # (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
 #
-lib_LTLIBRARIES = libcsg.la
 
-libcsg_la_SOURCES = common.cpp timekeeper.cpp debug.cpp			\
-	Surface.cpp							\
-	Cartesian.cpp							\
-	Polar.cpp							\
-	IcosahedralSphere.cpp						\
-	SphericalSphere.cpp						\
-	SphericalSurface.cpp						\
-	Arrow.cpp							\
-	Curve.cpp							\
-	Line.cpp							\
-	Box.cpp
-
-include_HEADERS = common.h timekeeper.h	debug.h				\
-	Surface.h							\
-	Cartesian.h							\
-	Polar.h								\
-	IcosahedralSphere.h						\
-	SphericalSphere.h						\
-	SphericalSurface.h						\
-	Arrow.h								\
-	Curve.h								\
-	Line.h								\
-	Box.h
+SUBDIRS = include lib
 
 noinst_PROGRAMS = example1 example2 example3 example4 example5 example6 \
 	example7 example8
 
 example1_SOURCES = example1.cpp
-example1_LDADD = libcsg.la
+example1_LDADD = lib/libcsg.la
 
 example2_SOURCES = example2.cpp
-example2_LDADD = libcsg.la
+example2_LDADD = lib/libcsg.la
 
 example3_SOURCES = example3.cpp
-example3_LDADD = libcsg.la
+example3_LDADD = lib/libcsg.la
 
 example4_SOURCES = example4.cpp
-example4_LDADD = libcsg.la
+example4_LDADD = lib/libcsg.la
 
 example5_SOURCES = example5.cpp
-example5_LDADD = libcsg.la
+example5_LDADD = lib/libcsg.la
 
 example6_SOURCES = example6.cpp
-example6_LDADD = libcsg.la
+example6_LDADD = lib/libcsg.la
 
 example7_SOURCES = example7.cpp
-example7_LDADD = libcsg.la
+example7_LDADD = lib/libcsg.la
 
 example8_SOURCES = example8.cpp
-example8_LDADD = libcsg.la
+example8_LDADD = lib/libcsg.la
 
 test:	example1
 	time ./example1 -d -r 10 -n 2 > example1.off
@@ -78,5 +55,5 @@ test7:	example7
 	time ./example7 -d > example7.off
 
 test8:	example8
-	time ./example8 -CXINS -d > example8.off
+	time ./example8 -XINFAS -d -x > example8.off
 

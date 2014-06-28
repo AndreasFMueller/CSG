@@ -26,7 +26,9 @@ void	Build_Cartesian::operator()(Polyhedron::HalfedgeDS& hds) {
 		}
 	}
 	for (int x = 0; x < _xsteps; x++) {
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "x = %d", x);
+		if (debuglevel > LOG_DEBUG) {
+			debug(LOG_DEBUG, DEBUG_LOG, 0, "x = %d", x);
+		}
 		for (int y = 0; y < _ysteps; y++) {
 			add_facet(B, 
 				vertex(x,     y    )    ,

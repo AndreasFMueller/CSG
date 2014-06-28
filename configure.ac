@@ -4,10 +4,10 @@
 AC_PREREQ(2.57)
 AC_REVISION([1.0])
 AC_INIT([csg], [1.0], [andreas.mueller@hsr.ch])
-AC_CONFIG_SRCDIR([common.h])
+AC_CONFIG_SRCDIR([include/common.h])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE([-Wall])
-AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_HEADERS(include/config.h)
 
 # some configuration directives
 
@@ -32,5 +32,5 @@ CXXFLAGS="${CXXFLAGS} -frounding-math"
 CFLAGS="${CFLAGS} -frounding-math"
 
 # create files
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(Makefile include/Makefile lib/Makefile)
 AC_OUTPUT
