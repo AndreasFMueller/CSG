@@ -26,7 +26,7 @@ namespace csg {
 typedef CGAL::Nef_nary_union_3<Nef_polyhedron>  Nef_nary_union;
 
 const double	a = 0.25;
-const double	speed = 1.5;
+const double	speed = 4;
 int	steps = 30;
 const	double	charstep = 0.25;
 
@@ -81,19 +81,26 @@ class AlternativeSolution : public PointFunction {
 		}
 		return f(sqrt(x * x - y * y), mu);
 	}
+	static double	gamma;
+	double	x(double xi, double eta) const {
+		return 4 * (pow(eta, gamma) + pow(xi, gamma));
+	}
+	double	y(double xi, double eta) const {
+		return 4 * (pow(eta, gamma) - pow(xi, gamma));
+	}
 public:
 	AlternativeSolution(double _mu) : mu(_mu) { }
 	virtual point	p(double xi, double eta) const {
-		double	x = 4 * (eta * eta + xi * xi);
-		double	y = 4 * (eta * eta - xi * xi);
-		return point(x, y, F(x, y));
+		double	xx = x(xi, eta);
+		double	yy = y(xi, eta);
+		return point(xx, yy, F(xx, yy));
 	}
 	virtual vector	v(double xi, double eta) const {
-		double	x = 4 * (eta * eta + xi * xi);
-		double	y = 4 * (eta * eta - xi * xi);
+		double	xx = x(xi, eta);
+		double	yy = y(xi, eta);
 		//debug(LOG_DEBUG, DEBUG_LOG, 0, "x = %f, y = %f", x, y);
 		double	dy = 0.0001;
-		double	derivative = (F(x, y + dy) - F(x, y)) / dy;
+		double	derivative = (F(xx, yy + dy) - F(xx, yy)) / dy;
 		//debug(LOG_DEBUG, DEBUG_LOG, 0, "derivative = %f\n", derivative);
 		vector	n =  vector(0., -derivative, 1.).normalized();
 		//debug(LOG_DEBUG, DEBUG_LOG, 0, "n = (%f, %f, %f)",
@@ -101,6 +108,7 @@ public:
 		return n;
 	}
 };
+double	AlternativeSolution::gamma = 1.5;
 
 class SupportSheet : public PointFunction {
 public:
@@ -197,15 +205,16 @@ double	sheetthickness = 0.05;
 double	smallcurveradius = 0.015;
 double	largecurveradius = 0.040;
 
-static Nef_polyhedron	build_alternative() {
+static Nef_polyhedron	build_alternative(double thickness) {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "build alternative solution surfaces");
 	Nef_nary_union	unioner;
 	CartesianDomain	xietadomain(Interval(0, 1), Interval(0, 1));
-	for (double m = 0.5; m > -0.4; m -= 0.25) {
+	for (double m = 0.5; m > -0.6; m -= 0.25) {
+	//for (double m = 0.25; m > 0.2; m -= 0.25) {
 		debug(LOG_DEBUG, DEBUG_LOG, 0, "m = %f", m);
 		AlternativeSolution	altsolution(m);
 		Build_CartesianPointFunction	a(altsolution,
-			xietadomain, 2 * steps, 2 * steps, sheetthickness);
+			xietadomain, 2 * steps, 2 * steps, thickness);
 		Polyhedron	p;
 		p.delegate(a);
 		Nef_polyhedron	n(p);
@@ -412,7 +421,7 @@ int	main(int argc, char *argv[]) {
 	try {
 		if (show_alternatives) {
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding alternatives");
-			unioner.add_polyhedron(build_alternative());
+			unioner.add_polyhedron(build_alternative(0.7 * sheetthickness));
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "alternatives added");
 		}
 	} catch (std::exception& x) {
