@@ -33,5 +33,6 @@ CFLAGS="${CFLAGS} -frounding-math"
 
 # create files
 AC_CONFIG_FILES([Makefile include/Makefile lib/Makefile app/Makefile
-	examples/Makefile app/pde1/Makefile app/pde2/Makefile])
+	examples/Makefile app/pde1/Makefile app/pde2/Makefile
+	app/helix/Makefile])
 AC_OUTPUT

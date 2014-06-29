@@ -122,7 +122,7 @@ int	main(int argc, char *argv[]) {
 	Nef_polyhedron	image = Nef_polyhedron(boxp) * unioner.get_union();
 
 	// now add the various components, starting with the X-axis
-	unioner.add_polyhedron(build_axes());
+	image = image + build_axes();
 
 	// output union
 	Polyhedron	P;
