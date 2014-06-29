@@ -65,7 +65,9 @@ void	Build_Curve::operator()(Polyhedron::HalfedgeDS& hds) {
 	// add all facets
 	
 	// start cap
-	debug(LOG_DEBUG, DEBUG_LOG, 0, "start cap");
+	if (debuglevel > LOG_DEBUG) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "start cap");
+	}
 	for (int phi = 0; phi < _phisteps - 1; phi++) {
 		add_facet(B, 0, vertex(0, phi), vertex(0, phi + 1));
 	}
@@ -97,7 +99,9 @@ void	Build_Curve::operator()(Polyhedron::HalfedgeDS& hds) {
 	}
 
 	// end cap
-	debug(LOG_DEBUG, DEBUG_LOG, 0, "end cap");
+	if (debuglevel > LOG_DEBUG) {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "end cap");
+	}
 	for (int phi = 0; phi < _phisteps - 1; phi++) {
 		add_facet(B,
 			vertex(_steps, phi),

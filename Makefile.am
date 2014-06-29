@@ -4,10 +4,10 @@
 # (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
 #
 
-SUBDIRS = include lib
+SUBDIRS = include lib app
 
 noinst_PROGRAMS = example1 example2 example3 example4 example5 example6 \
-	example7 example8
+	example7
 
 example1_SOURCES = example1.cpp
 example1_LDADD = lib/libcsg.la
@@ -30,9 +30,6 @@ example6_LDADD = lib/libcsg.la
 example7_SOURCES = example7.cpp
 example7_LDADD = lib/libcsg.la
 
-example8_SOURCES = example8.cpp
-example8_LDADD = lib/libcsg.la
-
 test:	example1
 	time ./example1 -d -r 10 -n 2 > example1.off
 
@@ -53,7 +50,4 @@ test6:	example6
 
 test7:	example7
 	time ./example7 -d > example7.off
-
-test8:	example8
-	time ./example8 -XINFAS -d -x > example8.off
 

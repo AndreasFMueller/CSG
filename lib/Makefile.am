@@ -15,5 +15,6 @@ libcsg_la_SOURCES = common.cpp timekeeper.cpp debug.cpp			\
 	Arrow.cpp							\
 	Curve.cpp							\
 	Line.cpp							\
-	Box.cpp
+	Box.cpp								\
+	Parts.cpp
 

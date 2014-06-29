@@ -11,6 +11,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Nef_polyhedron_3.h>
 #include <CGAL/Polyhedron_incremental_builder_3.h>
+#include <CGAL/Nef_nary_union_3.h>
 #include <math.h>
 
 namespace csg {
@@ -23,6 +24,7 @@ typedef CGAL::Nef_polyhedron_3<Kernel>		Nef_polyhedron;
 typedef	Nef_polyhedron::Plane_3			Plane;
 typedef Kernel::Aff_transformation_3		Aff_transformation;
 typedef CGAL::Polyhedron_incremental_builder_3<Polyhedron::HalfedgeDS>	Builder;
+typedef CGAL::Nef_nary_union_3<Nef_polyhedron>	Nef_nary_union;
 
 class Interval {
 	double	_min, _max;
