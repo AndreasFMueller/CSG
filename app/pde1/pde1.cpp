@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <common.h>
+#include <support.h>
 #include <debug.h>
 #include <Box.h>
 #include <Cartesian.h>
@@ -28,10 +29,14 @@ double	speed = 4;
 int	steps = 30;
 double	charstep = 0.25;
 int	phisteps = 12;
-double	sheetthickness = 0.05;
-double	smallcurveradius = 0.015;
-double	largecurveradius = 0.040;
 
+// thickness of solution and support sheets
+double	sheetthickness = 0.05;
+double	smallcurveradius = 0.04;
+double	arrowdiameter = 0.04;
+double	largecurveradius = 0.060;
+
+#if 0
 class SupportSheet : public PointFunction {
 public:
 	virtual point	p(double x, double z) const {
@@ -42,15 +47,36 @@ public:
 	}
 };
 
+class CharSupport : public PointFunction {
+public:
+	virtual point	p(double y, double z) const {
+		return point(0, y, (a * y * y + 0.001) * z);
+	}
+	virtual vector	v(double y, double z) const {
+		return vector::e1;
+	}
+};
+
 static Nef_polyhedron	build_support() {
-	CartesianDomain	domain(Interval(0, 4), Interval(0, 2));
-	SupportSheet	support;
-	Build_CartesianPointFunction	s(support,
-			domain, steps, steps, 0.5 * sheetthickness);
-	Polyhedron	p;
-	p.delegate(s);
-	return	Nef_polyhedron(p);
+	if (!yzslicing) {
+		CartesianDomain	domain(Interval(-2, 2), Interval(0, 1));
+		CharSupport	support;
+		Build_CartesianPointFunction	s(support,
+				domain, steps, steps, sheetthickness);
+		Polyhedron	p;
+		p.delegate(s);
+		return	Nef_polyhedron(p);
+	} else {
+		CartesianDomain	domain(Interval(0, 4), Interval(0, 2));
+		SupportSheet	support;
+		Build_CartesianPointFunction	s(support,
+				domain, steps, steps, sheetthickness);
+		Polyhedron	p;
+		p.delegate(s);
+		return	Nef_polyhedron(p);
+	}
 }
+#endif
 
 bool	show_solution = true;
 bool	show_characteristics = true;
@@ -118,7 +144,7 @@ int	main(int argc, char *argv[]) {
 	try {
 		if (show_solution) {
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding solution surface");
-			unioner.add_polyhedron(build_solution());
+			unioner.add_polyhedron(build_solution(sheetthickness));
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "solution surface added");
 		}
 	} catch (std::exception& x) {
@@ -130,7 +156,7 @@ int	main(int argc, char *argv[]) {
 	try {
 		if (show_alternatives) {
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding alternatives");
-			unioner.add_polyhedron(build_alternative(0.5 * sheetthickness));
+			unioner.add_polyhedron(build_alternative(sheetthickness));
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "alternatives added");
 		}
 	} catch (std::exception& x) {
@@ -178,7 +204,7 @@ int	main(int argc, char *argv[]) {
 	try {
 		if (show_support) {
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "adding support");
-			unioner.add_polyhedron(build_support());
+			unioner.add_polyhedron(build_support(sheetthickness));
 			debug(LOG_DEBUG, DEBUG_LOG, 0, "support added");
 		}
 	} catch (std::exception& x) {

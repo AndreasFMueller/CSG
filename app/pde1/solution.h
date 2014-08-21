@@ -25,7 +25,7 @@ public:
 	virtual vector	v(double x, double y) const;
 };
 
-Nef_polyhedron	build_solution();
+Nef_polyhedron	build_solution(double thickness);
 
 class AlternativeSolution : public PointFunction {
 	double	mu;

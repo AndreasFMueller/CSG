@@ -53,16 +53,20 @@ vector	Solution::v(double y0, double t) const {
 	double	x = -2 * a * y0 * s;
 	double	y = 2 * a * y0 * c;
 	double	z = s * (s - (t / y0) * c) - c * (c - (t / y0) * s);
-	return vector(x, y, z).normalized();
+	if (yzslicing) {
+		return vector(0, y, z).normalized();
+	} else {
+		return vector(x, 0, z).normalized();
+	}
 }
 
-Nef_polyhedron	build_solution() {
+Nef_polyhedron	build_solution(double thickness) {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "building solution surface");
 	Polyhedron	p;
 	CartesianDomain	domain(Interval(0, 4), Interval(-2, 2));
 	BaseSolution	basesolution;
 	Build_CartesianPointFunction	b(basesolution, domain,
-		2 * steps, 2 * steps, 0.5 * sheetthickness);
+		2 * steps, 2 * steps, thickness);
 	p.delegate(b);
 	return Nef_polyhedron(p);
 }

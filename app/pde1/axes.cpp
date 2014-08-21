@@ -16,7 +16,7 @@ Nef_polyhedron	build_axes() {
 		debug(LOG_DEBUG, DEBUG_LOG, 0, "add X-axis");
 		Polyhedron	p;
 		Build_Arrow	b(point(-0.1, 0, 0),
-					point(4.1, 0, 0), smallcurveradius, 16);
+					point(4.1, 0, 0), arrowdiameter, 16);
 		p.delegate(b);
 		unioner.add_polyhedron(p);
 	}
@@ -24,7 +24,7 @@ Nef_polyhedron	build_axes() {
 		debug(LOG_DEBUG, DEBUG_LOG, 0, "add Y-axis");
 		Polyhedron	p;
 		Build_Arrow	b(point(0, -2, 0),
-					point(0, 2, 0), smallcurveradius, 16);
+					point(0, 2, 0), arrowdiameter, 16);
 		p.delegate(b);
 		unioner.add_polyhedron(p);
 	}
@@ -32,7 +32,7 @@ Nef_polyhedron	build_axes() {
 		debug(LOG_DEBUG, DEBUG_LOG, 0, "add Z-axis");
 		Polyhedron	p;
 		Build_Arrow	b(point(0, 0, -2),
-					point(0, 0, 2), smallcurveradius, 16);
+					point(0, 0, 2), arrowdiameter, 16);
 		p.delegate(b);
 		unioner.add_polyhedron(p);
 	}

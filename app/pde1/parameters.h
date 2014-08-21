@@ -11,10 +11,12 @@ namespace csg {
 extern double	a;
 extern double	sheetthickness;
 extern double	smallcurveradius;
+extern double	arrowdiameter;
 extern double	largecurveradius;
 extern int	steps;
 extern int	phisteps;
 extern double	charstep;
+extern bool	yzslicing;
 
 } // namespace csg
 
