@@ -1,6 +1,6 @@
 /*
- * example5.cpp -- example 5, solution of partial differential equation by
- *                            characteristics
+ * pde2.cpp -- pde2, solution of partial differential equation using the
+ *             method of characteristics
  *
  * (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
  */
@@ -14,6 +14,7 @@
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 #include <solution.h>
 #include <characteristics.h>
+#include <support.h>
 #include <axes.h>
 #include <initialcurve.h>
 #include <Parts.h>
@@ -21,9 +22,10 @@
 
 namespace csg {
 
-int	phisteps = 4;
-int	curvesteps = 10;
+int	phisteps = 16;
+int	curvesteps = 30;
 double	radius = 0.1;
+double	thickness = 0.03;
 std::string	prefix("characteristics");
 
 /** 
@@ -34,7 +36,9 @@ int	main(int argc, char *argv[]) {
 	bool	initialcurve = true;
 	bool	solutionsurface = true;
 	bool	characteristics = true;
-	while (EOF != (c = getopt(argc, argv, "r:ds:p:ICSc:")))
+	bool	supportstructure = true;
+	bool	axesincluded = true;
+	while (EOF != (c = getopt(argc, argv, "r:ds:p:ICSc:XA")))
 		switch (c) {
 		case 'c':
 			curvesteps = atoi(optarg);
@@ -56,6 +60,12 @@ int	main(int argc, char *argv[]) {
 			break;
 		case 's':
 			phisteps = atoi(optarg);
+			break;
+		case 'X':
+			supportstructure = false;
+			break;
+		case 'A':
+			axesincluded = false;
 			break;
 		case 'p':
 			prefix = std::string(optarg);
@@ -121,8 +131,15 @@ int	main(int argc, char *argv[]) {
 	boxp.delegate(box);
 	Nef_polyhedron	image = Nef_polyhedron(boxp) * unioner.get_union();
 
+	// add the support structure
+	if (supportstructure) {
+		image = image + build_support(thickness);
+	}
+
 	// now add the various components, starting with the X-axis
-	image = image + build_axes();
+	if (axesincluded) {
+		image = image + build_axes();
+	}
 
 	// output union
 	Polyhedron	P;

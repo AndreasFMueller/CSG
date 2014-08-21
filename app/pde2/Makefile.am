@@ -3,11 +3,13 @@
 #
 # (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
 #
-noinst_HEADERS = parameters.h solution.h characteristics.h axes.h initialcurve.h
+noinst_HEADERS = parameters.h solution.h characteristics.h axes.h \
+	initialcurve.h support.h
 
 noinst_LTLIBRARIES = libpde2.la
 
-libpde2_la_SOURCES = solution.cpp characteristics.cpp axes.cpp initialcurve.cpp
+libpde2_la_SOURCES = solution.cpp characteristics.cpp axes.cpp \
+	initialcurve.cpp support.cpp
 
 noinst_PROGRAMS = pde2
 
