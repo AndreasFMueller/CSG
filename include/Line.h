@@ -20,7 +20,7 @@ public:
 	Line(const point& p0, const vector& r)
 		: CurveFunction(), _p0(p0), _r(r) { }
 	virtual point	position(double t) const { return _p0 + t * _r; }
-	virtual vector	tangent(double t) const { return _r; }
+	virtual vector	tangent(double /* t */) const { return _r; }
 	virtual vector	normal(double t) const;
 };
 

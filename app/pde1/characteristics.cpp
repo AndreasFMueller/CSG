@@ -58,11 +58,11 @@ point	Asymptote::position(double t) const {
 	return point(t, m * t, 0.);
 }
 
-vector	Asymptote::tangent(double t) const {
+vector	Asymptote::tangent(double /* t */) const {
 	return vector(1., m, 0.);
 }
 
-vector	Asymptote::normal(double t) const {
+vector	Asymptote::normal(double /* t */) const {
 	return vector::e2;
 }
 

@@ -7,7 +7,7 @@
 
 namespace csg {
 
-vector	Line::normal(double t) const {
+vector	Line::normal(double /* t */) const {
 	if (vector::e1.parallel(_r)) {
 		return vector::e2.orthogonalto(_r);
 	}

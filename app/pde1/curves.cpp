@@ -19,7 +19,7 @@ vector	InitialCurve::tangent(double t) const {
 	return vector(0., 1., 2 * a * t);
 }
 
-vector	InitialCurve::normal(double t) const {
+vector	InitialCurve::normal(double /* t */) const {
 	return vector(0., 0., 2 * a);
 }
 
@@ -45,7 +45,7 @@ vector	FCurve::tangent(double t) const {
 	return vector(1., 0., -2 * a * t);
 }
 
-vector	FCurve::normal(double t) const {
+vector	FCurve::normal(double /* t */) const {
 	return vector(0., 0., -2 * a);
 }
 

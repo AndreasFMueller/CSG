@@ -26,7 +26,7 @@ Nef_polyhedron	build_solution() {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "adding solution surface");
 	CartesianDomain	domain(Interval(0, 1.8), Interval(0, M_PI));
 	Solution	sol;
-	Build_CartesianFunction	b(sol, domain, curvesteps, curvesteps, 0.03);
+	Build_CartesianFunction	b(sol, domain, curvesteps, curvesteps, thickness);
 	Polyhedron	p;
 	p.delegate(b);
 	return Nef_polyhedron(p);

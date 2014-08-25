@@ -14,6 +14,7 @@
 #include <CGAL/IO/Nef_polyhedron_iostream_3.h>
 #include <solution.h>
 #include <characteristics.h>
+#include <parameters.h>
 #include <support.h>
 #include <axes.h>
 #include <initialcurve.h>
@@ -133,12 +134,20 @@ int	main(int argc, char *argv[]) {
 
 	// add the support structure
 	if (supportstructure) {
-		image = image + build_support(thickness);
+		try {
+			image = image + build_support(thickness);
+		} catch(...) {
+			fprintf(stderr, "exceptin while adding support");
+		}
 	}
 
 	// now add the various components, starting with the X-axis
 	if (axesincluded) {
-		image = image + build_axes();
+		try {
+			image = image + build_axes();
+		} catch(...) {
+			fprintf(stderr, "exceptin while adding axes");
+		}
 	}
 
 	// output union

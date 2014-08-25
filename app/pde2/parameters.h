@@ -14,6 +14,7 @@ extern int	phisteps;
 extern int	curvesteps;
 extern double	radius;
 extern std::string	prefix;
+extern double	thickness;
 
 } // namespace csg
 

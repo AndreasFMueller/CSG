@@ -32,7 +32,7 @@ public:
 	Interval(double min, double max) : _min(min), _max(max) { }
 	const double&	min() const { return _min; }
 	const double&	max() const { return _max; }
-	const double	length() const { return _max - _min; }
+	double	length() const { return _max - _min; }
 	bool	operator==(const Interval& other) const {
 		return (_min == other.min()) && (_max == other.max());
 	}
