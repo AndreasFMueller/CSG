@@ -51,7 +51,7 @@ public:
 class axissupport : public PointFunction {
 	hyperbola	top;
 	double	bottom(double x) const {
-		return exp(-x) * sin(-x * x / 2) - thickness / 2;
+		return exp(-x) * sin(-x * x / 2) - thickness / 4;
 	}
 public:
 	axissupport() : top(point2(0,1), point2(1.8, 0.01)) { }

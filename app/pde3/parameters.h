@@ -8,7 +8,12 @@
 
 namespace csg {
 
-double	thickness = 0.05;
+extern double	thickness;
+extern double	h;
+extern int	steps;
+extern double	arrowdiameter;
+extern double	smallcurveradius;
+extern double	a;
 
 };
 

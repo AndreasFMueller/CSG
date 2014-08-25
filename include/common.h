@@ -104,6 +104,9 @@ public:
 	point	operator-(const vector& other) const {
 		return point(_x - other.x(), _y - other.y(), _z - other.z());
 	}
+	vector	operator-(const point& other) const {
+		return vector(_x - other.x(), _y - other.y(), _z - other.z());
+	}
 };
 
 /**

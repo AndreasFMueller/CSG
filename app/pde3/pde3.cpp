@@ -7,6 +7,11 @@
 #include <parameters.h>
 #include <debug.h>
 #include <common.h>
+#include <CGAL/IO/Polyhedron_iostream.h>
+#include <CGAL/IO/Nef_polyhedron_iostream_3.h>
+#include <solution.h>
+#include <axes.h>
+#include <characteristics.h>
 
 namespace csg {
 
@@ -15,6 +20,12 @@ bool	axes_enable = true;
 bool	initial_enable = true;
 bool	characteristics_enable = true;
 bool	solution_enable = true;
+
+double	thickness = 0.03;
+int	steps = 20;
+double	arrowdiameter = 0.04;
+double	smallcurveradius = 0.04;
+double	a = 0.18;
 
 int	main(int argc, char *argv[]) {
 	int	c;
@@ -43,6 +54,46 @@ int	main(int argc, char *argv[]) {
 			solution_enable = false;
 			break;
 		}
+
+	Nef_nary_union	unioner;
+
+	// solution
+	try {
+		if (solution_enable) {
+			unioner.add_polyhedron(build_solution(thickness));
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add solution: %s", x.what());
+	}
+
+	// characteristics
+	try {
+		if (characteristics_enable) {
+			unioner.add_polyhedron(build_characteristics());
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add charactistics: %s", x.what());
+	}
+
+	// axes
+	try {
+		if (axes_enable) {
+			unioner.add_polyhedron(build_axes());
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add axes: %s", x.what());
+	}
+
+	// extract
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "extracting image");
+	Nef_polyhedron	image = unioner.get_union();
+
+	// output
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "covert for output");
+	Polyhedron	P;
+	image.convert_to_polyhedron(P);
+	std::cout << P;
+
 	return EXIT_SUCCESS;
 }
 

@@ -36,48 +36,6 @@ double	smallcurveradius = 0.04;
 double	arrowdiameter = 0.04;
 double	largecurveradius = 0.060;
 
-#if 0
-class SupportSheet : public PointFunction {
-public:
-	virtual point	p(double x, double z) const {
-		return point(x, 0, -z - a * x * x);
-	}
-	virtual vector	v(double x, double z) const {
-		return vector::e2;
-	}
-};
-
-class CharSupport : public PointFunction {
-public:
-	virtual point	p(double y, double z) const {
-		return point(0, y, (a * y * y + 0.001) * z);
-	}
-	virtual vector	v(double y, double z) const {
-		return vector::e1;
-	}
-};
-
-static Nef_polyhedron	build_support() {
-	if (!yzslicing) {
-		CartesianDomain	domain(Interval(-2, 2), Interval(0, 1));
-		CharSupport	support;
-		Build_CartesianPointFunction	s(support,
-				domain, steps, steps, sheetthickness);
-		Polyhedron	p;
-		p.delegate(s);
-		return	Nef_polyhedron(p);
-	} else {
-		CartesianDomain	domain(Interval(0, 4), Interval(0, 2));
-		SupportSheet	support;
-		Build_CartesianPointFunction	s(support,
-				domain, steps, steps, sheetthickness);
-		Polyhedron	p;
-		p.delegate(s);
-		return	Nef_polyhedron(p);
-	}
-}
-#endif
-
 bool	show_solution = true;
 bool	show_characteristics = true;
 bool	show_alternatives = true;
