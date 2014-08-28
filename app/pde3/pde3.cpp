@@ -13,6 +13,8 @@
 #include <axes.h>
 #include <characteristics.h>
 #include <math.h>
+#include <support.h>
+#include <Parts.h>
 
 namespace csg {
 
@@ -26,7 +28,7 @@ double	thickness = 0.03;
 int	steps = 20;
 double	arrowdiameter = 0.04;
 double	smallcurveradius = 0.04;
-double	a = 2.;
+double	a = 1.5;
 double	xa = 1.5;
 
 double	f(double x) {
@@ -72,7 +74,8 @@ int	main(int argc, char *argv[]) {
 			unioner.add_polyhedron(build_solution(thickness));
 		}
 	} catch (std::exception& x) {
-		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add solution: %s", x.what());
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add solution: %s",
+			x.what());
 	}
 
 	// characteristics
@@ -81,7 +84,21 @@ int	main(int argc, char *argv[]) {
 			unioner.add_polyhedron(build_characteristics());
 		}
 	} catch (std::exception& x) {
-		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add charactistics: %s", x.what());
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add charactistics: %s",
+			x.what());
+	}
+
+	// add the support
+	try {
+		if (support_enable) {
+			unioner.add_polyhedron(
+				build_cutsupport(thickness));
+			unioner.add_polyhedron(
+				build_axessupport(thickness));
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add supports: %s",
+			x.what());
 	}
 
 	// axes
@@ -98,11 +115,17 @@ int	main(int argc, char *argv[]) {
 	Nef_polyhedron	image = unioner.get_union();
 
 	// output
-	debug(LOG_DEBUG, DEBUG_LOG, 0, "covert for output");
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "convert for output");
 	Polyhedron	P;
 	image.convert_to_polyhedron(P);
 	std::cout << P;
 
+	// output halves
+	PartWriter	pw("nosolution");
+	pw(PartWriter::BACK_PART, image);
+	pw(PartWriter::FRONT_PART, image);
+
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "output complete");
 	return EXIT_SUCCESS;
 }
 

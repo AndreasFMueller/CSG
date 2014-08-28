@@ -15,5 +15,6 @@ include_HEADERS = common.h timekeeper.h	debug.h				\
 	Curve.h								\
 	Line.h								\
 	Box.h								\
-	Parts.h
+	Parts.h								\
+	hyperbola.h
 

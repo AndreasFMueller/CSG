@@ -27,7 +27,8 @@ static void	add_characteristic(Nef_nary_union& unioner, double r) {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "add characteristic for r = %f", r);
 	Interval	interval(-M_PI, M_PI);
 	Characteristic	cs(r);
-	Build_Curve	charcurve(cs, interval, steps, 8, smallcurveradius);
+	Build_Curve	charcurve(cs, interval, 3 * steps, 12,
+				smallcurveradius);
 	Polyhedron	p;
 	p.delegate(charcurve);
 	Nef_polyhedron	n(p);

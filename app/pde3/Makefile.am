@@ -3,11 +3,11 @@
 #
 # (c) 2014 Prof Dr Andreas Mueller, Hochschule Rapperswil
 #
-noinst_HEADERS = parameters.h solution.h axes.h characteristics.h
+noinst_HEADERS = parameters.h solution.h axes.h characteristics.h support.h
 
 noinst_LTLIBRARIES = libpde3.la
 
-libpde3_la_SOURCES = solution.cpp axes.cpp characteristics.cpp
+libpde3_la_SOURCES = solution.cpp axes.cpp characteristics.cpp support.cpp
 
 noinst_PROGRAMS = pde3
 
