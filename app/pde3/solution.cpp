@@ -15,7 +15,7 @@ namespace csg {
 point	Solution::p(double r, double t) const {
 	double	x = -r * cos(t);
 	double	y = -r * sin(t);
-	double	z = a * ((1 + 0.5 * r * r) * t - 0.25 * r * r * sin(2 * t));
+	double	z = f(r) * t;
 	return point(x, y, z);
 }
 

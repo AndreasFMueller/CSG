@@ -12,6 +12,7 @@
 #include <solution.h>
 #include <axes.h>
 #include <characteristics.h>
+#include <math.h>
 
 namespace csg {
 
@@ -25,7 +26,15 @@ double	thickness = 0.03;
 int	steps = 20;
 double	arrowdiameter = 0.04;
 double	smallcurveradius = 0.04;
-double	a = 0.18;
+double	a = 2.;
+double	xa = 1.5;
+
+double	f(double x) {
+	if (x > xa) {
+		return a / M_PI;
+	}
+	return a * x * x * (3 * xa - 2 * x) / (xa * xa * xa * M_PI);
+}
 
 int	main(int argc, char *argv[]) {
 	int	c;

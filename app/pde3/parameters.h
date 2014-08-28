@@ -14,6 +14,7 @@ extern int	steps;
 extern double	arrowdiameter;
 extern double	smallcurveradius;
 extern double	a;
+extern double	f(double x);
 
 };
 

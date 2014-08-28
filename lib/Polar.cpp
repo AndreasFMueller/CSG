@@ -215,7 +215,7 @@ void	Build_Polar::operator()(Polyhedron::HalfedgeDS& hds) {
 	add_surface_fan(B);
 	add_radius_surface(B);
 	add_perimeter(B);
-	debug(LOG_DEBUG, DEBUG_LOG, 0, "all factes added");
+	debug(LOG_DEBUG, DEBUG_LOG, 0, "all facets added");
 	B.end_surface();
 }
 

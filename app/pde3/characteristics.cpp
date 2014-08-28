@@ -14,15 +14,12 @@
 namespace csg {
 
 point	Characteristic::position(double t) const {
-	point	p(-r * cos(t), -r * sin(t),
-			a * ((1 + 0.5 * r * r) * t - 0.25 * r * r * sin(2 * t))
-);
+	point	p(-r * cos(t), -r * sin(t), f(r) * t);
 	return p;
 }
 
 vector	Characteristic::tangent(double t) const {
-	vector	v(r * sin(t), -r * cos(t), 
-		a * ((1 + 0.5 * r * r) - 0.5 * r * r * cos(2 * t)));
+	vector	v(r * sin(t), -r * cos(t), f(r));
 	return v;
 }
 
