@@ -30,6 +30,7 @@ double	arrowdiameter = 0.04;
 double	smallcurveradius = 0.04;
 double	a = 1.5;
 double	xa = 1.5;
+double	offset = -0.001;
 
 double	f(double x) {
 	if (x > xa) {
@@ -131,12 +132,12 @@ int	main(int argc, char *argv[]) {
 
 	// output halves
 	PartWriter	pw("nosolution");
-	pw(PartWriter::BACK_PART, image, -0.01);
-	pw(PartWriter::FRONT_PART, image, -0.01);
-	pw(PartWriter::LEFT_PART, image, -0.01);
-	pw(PartWriter::RIGHT_PART, image, -0.01);
-	pw(PartWriter::TOP_PART, image, -0.01);
-	pw(PartWriter::BOTTOM_PART, image, -0.01);
+	pw(PartWriter::BACK_PART, image, offset);
+	pw(PartWriter::FRONT_PART, image, offset);
+	pw(PartWriter::LEFT_PART, image, offset);
+	pw(PartWriter::RIGHT_PART, image, offset);
+	pw(PartWriter::TOP_PART, image, offset);
+	pw(PartWriter::BOTTOM_PART, image, offset);
 
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "output complete");
 	return EXIT_SUCCESS;
