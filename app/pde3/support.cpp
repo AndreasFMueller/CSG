@@ -13,7 +13,7 @@ namespace csg {
 
 double	cutsupport::top(double x) const {
 	//return _sign * (f(x) + 0.001) * M_PI;
-	return _sign * (h(x) + 0.001);
+	return _sign * (h(x) + 0.005);
 }
 
 point	cutsupport::p(double x, double z) const {
@@ -21,7 +21,7 @@ point	cutsupport::p(double x, double z) const {
 	return point(x, 0 * _y, z * t);
 }
 
-vector	cutsupport::v(double x, double z) const {
+vector	cutsupport::v(double /* x */, double /* z */) const {
 	return vector::e2;
 }	
 
@@ -46,13 +46,13 @@ class axessupport1 : public PointFunction {
 public:
 	axessupport1() : bottom(point2(0, -a), point2(2, 0), -1) { }
 	virtual	point	p(double y, double z) const {
-		double	v1 = bottom(y) - 0.001;
+		double	v1 = bottom(y) - 0.002;
 		double	v2 = -f(y) * M_PI / 2;
 		double	v = std::min(v1, v2);
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "y = %f -> %f", y, v);
+		// debug(LOG_DEBUG, DEBUG_LOG, 0, "y = %f -> %f", y, v);
 		return point(0, y, z * v);
 	}
-	virtual vector	v(double y, double z) const {
+	virtual vector	v(double /* y */ , double /* z */) const {
 		return vector::e1;
 	}
 };
@@ -62,13 +62,13 @@ class axessupport2 : public PointFunction {
 public:
 	axessupport2() : top(point2(-2, 0), point2(0, a), 1) { }
 	virtual	point	p(double y, double z) const {
-		double	v1 = top(y) + 0.001;
+		double	v1 = top(y) + 0.002;
 		double	v2 = f(-y) * M_PI / 2;
 		double	v = std::max(v1, v2);
-		debug(LOG_DEBUG, DEBUG_LOG, 0, "y = %f -> %f", y, v);
+		// debug(LOG_DEBUG, DEBUG_LOG, 0, "y = %f -> %f", y, v);
 		return point(0, y, z * v);
 	}
-	virtual vector	v(double y, double z) const {
+	virtual vector	v(double /* y */, double /* z */) const {
 		return vector::e1;
 	}
 };

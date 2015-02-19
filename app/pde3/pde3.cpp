@@ -23,6 +23,7 @@ bool	axes_enable = true;
 bool	initial_enable = true;
 bool	characteristics_enable = true;
 bool	solution_enable = true;
+bool	axessupport_enable = true;
 
 double	thickness = 0.03;
 int	steps = 20;
@@ -40,7 +41,7 @@ double	f(double x) {
 
 int	main(int argc, char *argv[]) {
 	int	c;
-	while (EOF != (c = getopt(argc, argv, "dPXICS")))
+	while (EOF != (c = getopt(argc, argv, "dPXACSI")))
 		switch (c) {
 		case 'd':
 			if (debuglevel == LOG_DEBUG) {
@@ -54,6 +55,9 @@ int	main(int argc, char *argv[]) {
 			break;
 		case 'X':
 			axes_enable = false;
+			break;
+		case 'A':
+			axessupport_enable = false;
 			break;
 		case 'I':
 			initial_enable = false;
@@ -88,16 +92,25 @@ int	main(int argc, char *argv[]) {
 			x.what());
 	}
 
-	// add the support
+	// add the cut support
 	try {
 		if (support_enable) {
 			unioner.add_polyhedron(
-				build_cutsupport(thickness));
+				build_cutsupport(2 * thickness));
+		}
+	} catch (std::exception& x) {
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add cut supports: %s",
+			x.what());
+	}
+
+	// add the axes support
+	try {
+		if (axessupport_enable) {
 			unioner.add_polyhedron(
 				build_axessupport(thickness));
 		}
 	} catch (std::exception& x) {
-		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add supports: %s",
+		debug(LOG_ERR, DEBUG_LOG, 0, "failed to add axes supports: %s",
 			x.what());
 	}
 
@@ -122,8 +135,12 @@ int	main(int argc, char *argv[]) {
 
 	// output halves
 	PartWriter	pw("nosolution");
-	pw(PartWriter::BACK_PART, image);
-	pw(PartWriter::FRONT_PART, image);
+	pw(PartWriter::BACK_PART, image, -0.01);
+	pw(PartWriter::FRONT_PART, image, -0.01);
+	pw(PartWriter::LEFT_PART, image, -0.01);
+	pw(PartWriter::RIGHT_PART, image, -0.01);
+	pw(PartWriter::TOP_PART, image, -0.01);
+	pw(PartWriter::BOTTOM_PART, image, -0.01);
 
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "output complete");
 	return EXIT_SUCCESS;

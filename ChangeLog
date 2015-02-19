@@ -1,3 +1,7 @@
+20150219:
+	* add offset to part writer in an attempt to solve the simpleness
+	  problems encountered in the pde3 app
+
 20140626:
 	* add example8, solution surfaces of a partial differential equation,
 	  case where solution is not uniquely determined by the boundary

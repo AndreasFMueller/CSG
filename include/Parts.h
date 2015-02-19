@@ -22,7 +22,8 @@ public:
 		FRONT_PART, BACK_PART,
 		TOP_PART, BOTTOM_PART
 	} object_part;
-	void	operator()(const object_part& part, Nef_polyhedron& image) const;
+	void	operator()(const object_part& part, Nef_polyhedron& image,
+			double offset = 0) const;
 };
 
 } // namespace csg

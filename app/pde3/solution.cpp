@@ -29,7 +29,8 @@ vector	Solution::v(double r, double t) const {
 Nef_polyhedron	build_solution(double thickness) {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "building solution surface");
 	Polyhedron	p;
-	PolarDomain	domain(Interval(0.01, 2.1 * sqrt(2)), Interval(-M_PI, M_PI));
+	PolarDomain	domain(Interval(0.01, 2.1 * sqrt(2)),
+				Interval(-M_PI - 0.01, M_PI + 0.01));
 	Solution	solution(a);
 	Build_PolarPointFunction	s(solution, domain, 2 * steps, 2 * steps, thickness);
 	p.delegate(s);

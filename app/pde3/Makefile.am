@@ -15,5 +15,5 @@ pde3_SOURCES = pde3.cpp
 pde3_LDADD = $(top_builddir)/lib/libcsg.la libpde3.la
 
 test:	pde3
-	time ./pde3 -XINFAS -d -x > pde3.off
+	time ./pde3 -XIAS -d > pde3.off
 

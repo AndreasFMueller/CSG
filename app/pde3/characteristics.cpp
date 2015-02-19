@@ -25,7 +25,7 @@ vector	Characteristic::tangent(double t) const {
 
 static void	add_characteristic(Nef_nary_union& unioner, double r) {
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "add characteristic for r = %f", r);
-	Interval	interval(-M_PI, M_PI);
+	Interval	interval(-M_PI - 0.01, M_PI + 0.01);
 	Characteristic	cs(r);
 	Build_Curve	charcurve(cs, interval, 3 * steps, 12,
 				smallcurveradius);

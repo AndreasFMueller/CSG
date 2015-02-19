@@ -23,6 +23,7 @@ void	PartWriter::write_part(Nef_polyhedron& image, const std::string& part,
 					+ std::string(".off");
 		std::ofstream	out(name.c_str());
 		Polyhedron	P;
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "intersect with half space");
 		(halfspace * image).convert_to_polyhedron(P);
 		debug(LOG_DEBUG, DEBUG_LOG, 0,
 			"conversion to polygon complete");
@@ -39,36 +40,36 @@ void	PartWriter::write_part(Nef_polyhedron& image, const std::string& part,
 }
 
 void	PartWriter::operator()(const object_part& part,
-			Nef_polyhedron& image) const {
+			Nef_polyhedron& image, double offset) const {
 	switch (part) {
 	case LEFT_PART:
 		write_part(image, std::string("left"),
-			Nef_polyhedron(Plane(1, 0, 0, 0),
+			Nef_polyhedron(Plane(1, 0, 0, offset),
 				Nef_polyhedron::INCLUDED));
 		break;
 	case RIGHT_PART:
 		write_part(image, std::string("right"), 
-			Nef_polyhedron(Plane(-1, 0, 0, 0),
+			Nef_polyhedron(Plane(-1, 0, 0, offset),
 				Nef_polyhedron::INCLUDED));
 		break;
 	case FRONT_PART:
 		write_part(image, std::string("front"),
-			Nef_polyhedron(Plane(0, 1, 0, 0),
+			Nef_polyhedron(Plane(0, 1, 0, offset),
 				Nef_polyhedron::INCLUDED));
 		break;
 	case BACK_PART:
 		write_part(image, std::string("back"),
-			Nef_polyhedron(Plane(0, -1, 0, 0),
+			Nef_polyhedron(Plane(0, -1, 0, offset),
 				Nef_polyhedron::INCLUDED));
 		break;
 	case TOP_PART:
 		write_part(image, std::string("top"),
-			Nef_polyhedron(Plane(0, 0, 1, 0),
+			Nef_polyhedron(Plane(0, 0, 1, offset),
 				Nef_polyhedron::INCLUDED));
 		break;
 	case BOTTOM_PART:
 		write_part(image, std::string("bottom"),
-			Nef_polyhedron(Plane(0, 0, -1, 0),
+			Nef_polyhedron(Plane(0, 0, -1, offset),
 				Nef_polyhedron::INCLUDED));
 		break;
 	}
