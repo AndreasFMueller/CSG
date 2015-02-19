@@ -1,6 +1,7 @@
 20150219:
 	* add offset to part writer in an attempt to solve the simpleness
 	  problems encountered in the pde3 app
+	* remove unused -I option from pde3.cpp
 
 20140626:
 	* add example8, solution surfaces of a partial differential equation,

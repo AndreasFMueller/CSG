@@ -20,7 +20,6 @@ namespace csg {
 
 bool	support_enable = true;
 bool	axes_enable = true;
-bool	initial_enable = true;
 bool	characteristics_enable = true;
 bool	solution_enable = true;
 bool	axessupport_enable = true;
@@ -41,7 +40,7 @@ double	f(double x) {
 
 int	main(int argc, char *argv[]) {
 	int	c;
-	while (EOF != (c = getopt(argc, argv, "dPXACSI")))
+	while (EOF != (c = getopt(argc, argv, "dPXACS")))
 		switch (c) {
 		case 'd':
 			if (debuglevel == LOG_DEBUG) {
@@ -58,9 +57,6 @@ int	main(int argc, char *argv[]) {
 			break;
 		case 'A':
 			axessupport_enable = false;
-			break;
-		case 'I':
-			initial_enable = false;
 			break;
 		case 'C':
 			characteristics_enable = false;
