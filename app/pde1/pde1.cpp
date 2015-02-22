@@ -51,7 +51,7 @@ bool	show_fcurve = true;
 int	main(int argc, char *argv[]) {
 
 	int	c;
-	while (EOF != (c = getopt(argc, argv, "dSACIXNPFx")))
+	while (EOF != (c = getopt(argc, argv, "dSACIXNPFxp:")))
 		switch (c) {
 		case 'd':
 			if (debuglevel == LOG_DEBUG) {
@@ -204,11 +204,15 @@ int	main(int argc, char *argv[]) {
 	std::cout << P;
 
 	// write parts
-	PartWriter	pw(prefix);
-	pw(PartWriter::LEFT_PART, image);
-	pw(PartWriter::RIGHT_PART, image);
-	pw(PartWriter::FRONT_PART, image);
-	pw(PartWriter::BACK_PART, image);
+	if (prefix.size() > 0) {
+		PartWriter	pw(prefix);
+		pw(PartWriter::LEFT_PART, image);
+		pw(PartWriter::RIGHT_PART, image);
+		pw(PartWriter::FRONT_PART, image);
+		pw(PartWriter::BACK_PART, image);
+	} else {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "part output suppressed");
+	}
 
 	// that's it
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "output complete");

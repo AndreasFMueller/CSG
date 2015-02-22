@@ -157,9 +157,13 @@ int	main(int argc, char *argv[]) {
 
 	// now we have to cut along the y-z-plane, because otherwise it would
 	// hardly be printable
-	PartWriter	pw(prefix);
-	pw(PartWriter::LEFT_PART, image);
-	pw(PartWriter::RIGHT_PART, image);
+	if (prefix.size() > 0) {
+		PartWriter	pw(prefix);
+		pw(PartWriter::LEFT_PART, image);
+		pw(PartWriter::RIGHT_PART, image);
+	} else {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "part output suppressed");
+	}
 
 	return EXIT_SUCCESS;
 }

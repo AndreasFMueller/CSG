@@ -32,6 +32,8 @@ double	a = 1.5;
 double	xa = 1.5;
 double	offset = -0.001;
 
+std::string	prefix("nosolution");
+
 double	f(double x) {
 	if (x > xa) {
 		return a / M_PI;
@@ -41,7 +43,7 @@ double	f(double x) {
 
 int	main(int argc, char *argv[]) {
 	int	c;
-	while (EOF != (c = getopt(argc, argv, "dPXACS")))
+	while (EOF != (c = getopt(argc, argv, "dPXACSp:")))
 		switch (c) {
 		case 'd':
 			if (debuglevel == LOG_DEBUG) {
@@ -64,6 +66,9 @@ int	main(int argc, char *argv[]) {
 			break;
 		case 'S':
 			solution_enable = false;
+			break;
+		case 'p':
+			prefix = std::string(optarg);
 			break;
 		}
 
@@ -131,13 +136,17 @@ int	main(int argc, char *argv[]) {
 	std::cout << P;
 
 	// output halves
-	PartWriter	pw("nosolution");
-	pw(PartWriter::BACK_PART, image, offset);
-	pw(PartWriter::FRONT_PART, image, offset);
-	pw(PartWriter::LEFT_PART, image, offset);
-	pw(PartWriter::RIGHT_PART, image, offset);
-	pw(PartWriter::TOP_PART, image, offset);
-	pw(PartWriter::BOTTOM_PART, image, offset);
+	if (prefix.size() > 0) {
+		PartWriter	pw(prefix);
+		pw(PartWriter::BACK_PART, image, offset);
+		pw(PartWriter::FRONT_PART, image, offset);
+		pw(PartWriter::LEFT_PART, image, offset);
+		pw(PartWriter::RIGHT_PART, image, offset);
+		pw(PartWriter::TOP_PART, image, offset);
+		pw(PartWriter::BOTTOM_PART, image, offset);
+	} else {
+		debug(LOG_DEBUG, DEBUG_LOG, 0, "part output suppressed");
+	}
 
 	debug(LOG_DEBUG, DEBUG_LOG, 0, "output complete");
 	return EXIT_SUCCESS;
